@@ -35,6 +35,7 @@ h2{font:800 26px Syne;margin-bottom:8px}
 .am{background:var(--ink2);border-radius:24px;padding:28px;max-width:400px;width:100%}
 .am input{width:100%;padding:13px;border-radius:12px;border:1px solid var(--line);background:var(--ink);color:#fff;font:15px Inter;margin:8px 0}
 .two{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px}
+.of{display:flex;justify-content:space-between;align-items:center;gap:10px;background:var(--ink);padding:12px;border-radius:12px;margin-top:8px}
 :focus-visible{outline:3px solid #ffb400;outline-offset:2px}
 #toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(90px);background:#fff;color:var(--ink);padding:12px 20px;border-radius:14px;font-weight:600;transition:transform .3s;z-index:20;max-width:90vw}
 #toast.show{transform:translateX(-50%)}
@@ -49,11 +50,14 @@ h2{font:800 26px Syne;margin-bottom:8px}
 <div class="tabs">
   <button class="tab on" data-v="inv">My inventory</button>
   <button class="tab" data-v="mkt">Player market</button>
+  <button class="tab" data-v="wk">Workers</button>
   <a class="tab" href="https://mohamednaser2143-sudo.github.io/solex/">Shop at SoleX</a>
 </div>
 <section class="view" id="v-inv"><h2>My inventory</h2><p class="msg" id="invmsg"></p><div class="cards" id="inv"></div></section>
 <section class="view" id="v-mkt" hidden><h2>Player market</h2><p class="msg" id="mktmsg"></p><div class="cards" id="mkt"></div></section>
 
+<section class="view" id="v-wk" hidden><h2>Workers</h2><p class="msg">Hire up to 5 workers. The more expensive the worker, the more they pay: 30, 45, 60, 80 and 100 coins every 2 minutes.</p><div id="wk"></div></section>
+<div class="ov" id="om"><div class="am"><h2>Offers</h2><p class="msg">Pick an offer. Offers expire in 3 minutes.</p><div id="ol"></div></div></div>
 <div class="ov" id="am"><div class="am">
   <h2>Welcome</h2><p class="msg">Create an account and start with 1,000 coins.</p>
   <input id="em" type="email" placeholder="Email" autocomplete="email">
@@ -89,6 +93,7 @@ function shoeSVG(c,f){
 let me=null,prof=null,INV=[],MK=[];
 async function load(){
  if(!me){prof=null;INV=[];MK=[];return paint()}
+ await SB.rpc('collect');
  const [p,i,m]=await Promise.all([
   SB.from('profiles').select('*').eq('id',me.id).single(),
   SB.from('inventory').select('*').order('id',{ascending:false}),
@@ -99,24 +104,37 @@ function pic(s){return `<div class="pic"><span style="background:${RC[s.r]||RC.C
 function paint(){
  $('#auth').textContent=me?'Sign out':'Sign in';
  $('#coins').textContent=me&&prof?prof.coins.toLocaleString()+' coins':'';
- $('#inv').innerHTML=INV.map(d=>`<div class="card">${pic(d.shoe)}<p>${esc(d.shoe.n)}</p><small>Size ${esc(d.size)}${d.paid?' &middot; paid '+d.paid:''}</small><div class="row"><button class="btn pri" data-sell="${d.id}">Sell</button></div></div>`).join('');
+ $('#inv').innerHTML=INV.map(d=>`<div class="card">${pic(d.shoe)}<p>${esc(d.shoe.n)}</p><small>Size ${esc(d.size)}${d.paid?' &middot; paid '+d.paid:''}${d.shoe.v?' &middot; worth '+d.shoe.v.toLocaleString():''}</small><div class="row"><button class="btn pri" data-offer="${d.id}">Get offers</button><button class="btn" style="margin-top:8px" data-sell="${d.id}">List for players</button></div></div>`).join('');
  $('#invmsg').innerHTML=!me?'Sign in to see your shoes.':INV.length?'':`Nothing yet. <a href="${SOLEX}">Buy your first pair at SoleX</a>.`;
  $('#mkt').innerHTML=MK.map(d=>{const own=me&&d.seller===me.id;return `<div class="card">${pic(d.shoe)}<p>${esc(d.shoe.n)}</p><small>Size ${esc(d.size)} &middot; ${d.price.toLocaleString()} coins</small><small>Seller: ${esc(d.seller_name)}</small><div class="row"><button class="btn ${own?'':'pri'}" data-id="${d.id}" data-a="${own?'x':'b'}">${own?'Cancel listing':'Buy'}</button></div></div>`}).join('');
  $('#mktmsg').textContent=!me?'Sign in to see listings.':MK.length?'':'No listings yet. Sell a shoe from your inventory.';
+ const w=prof?prof.workers:0,cost=500*Math.pow(2,w),PAY=[30,45,60,80,100],earn=PAY.slice(0,w).reduce((a,b)=>a+b,0);
+ $('#wk').innerHTML=!me?'<p class="msg">Sign in to hire workers.</p>':`<div class="card" style="max-width:420px"><p style="font-size:20px">Workers: ${w} / 5</p><small>Your workers send you ${earn} coins every 2 minutes right now.${w<5?` Your next worker pays ${PAY[w]} coins every 2 minutes.`:''}</small><div class="row"><button class="btn pri" id="hire" ${w>=5?'disabled':''}>${w>=5?'Max workers reached':'Hire worker '+(w+1)+' for '+cost.toLocaleString()+' coins'}</button></div></div>`;
 }
 async function rpc(fn,args,ok){
  const {error}=await SB.rpc(fn,args);
  if(error){toast(error.message);return}
  toast(ok);load();
 }
-$('#inv').onclick=e=>{const id=e.target.dataset.sell;if(!id)return;
- const p=Math.round(+prompt('Sell for how many coins?','500'));if(!(p>0))return;
- rpc('list_shoe',{p_inv:+id,p_price:p},'Listed on the player market')};
+$('#inv').onclick=async e=>{
+ const so=e.target.dataset.sell,of=e.target.dataset.offer;
+ if(of){const {data,error}=await SB.rpc('get_offers',{p_inv:+of});if(error)return toast(error.message);
+  $('#ol').innerHTML=data.map(o=>`<div class="of"><span><b>${esc(o.buyer)}</b> offers <b>${o.amount.toLocaleString()}</b> coins</span><button class="btn pri" data-o="${o.id}">Accept</button></div>`).join('');
+  $('#om').classList.add('on');return}
+ if(so){const p=Math.round(+prompt('Sell for how many coins?','500'));if(!(p>0))return;
+  rpc('list_shoe',{p_inv:+so,p_price:p},'Listed on the player market')}};
+$('#om').onclick=async e=>{
+ if(e.target.id==='om')return $('#om').classList.remove('on');
+ const id=e.target.dataset.o;if(!id)return;
+ const {data,error}=await SB.rpc('accept_offer',{p_offer_id:+id});
+ $('#om').classList.remove('on');if(error)return toast(error.message);
+ toast('Sold for '+data.toLocaleString()+' coins');load()};
+$('#wk').onclick=e=>{if(e.target.id==='hire')rpc('hire_worker',{},'Worker hired!')};
 $('#mkt').onclick=e=>{const b=e.target.closest('button');if(!b)return;
  b.dataset.a==='x'?rpc('cancel_listing',{p_id:+b.dataset.id},'Back in your inventory'):rpc('buy_listing',{p_id:+b.dataset.id},'Bought! Check your inventory')};
 document.querySelectorAll('.tab[data-v]').forEach(b=>b.onclick=()=>{
  document.querySelectorAll('.tab[data-v]').forEach(t=>t.classList.toggle('on',t===b));
- ['inv','mkt'].forEach(v=>$('#v-'+v).hidden=v!==b.dataset.v);load()});
+ ['inv','mkt','wk'].forEach(v=>$('#v-'+v).hidden=v!==b.dataset.v);load()});
 async function login(up){
  const email=$('#em').value.trim(),password=$('#pw').value;
  const r=up?await SB.auth.signUp({email,password}):await SB.auth.signInWithPassword({email,password});
