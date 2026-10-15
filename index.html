@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>SoleSmith - Design Your Own Sneaker</title>
+<title>SoleSmith - Inventory & Player Market</title>
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=Inter:wght@400;600&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
@@ -13,92 +13,53 @@ body{font-family:Inter,system-ui,sans-serif;background:var(--ink);color:#fff;min
 header{display:flex;justify-content:space-between;align-items:center;padding:18px 28px;gap:12px;flex-wrap:wrap}
 .logo{font-family:Syne,sans-serif;font-weight:800;font-size:26px;letter-spacing:-.5px}
 .logo b{color:var(--coral)}
-.chal{font-size:13px;color:var(--mut);border:1px solid var(--line);padding:8px 14px;border-radius:99px}
-.chal strong{color:#fff}
-main{display:grid;grid-template-columns:1.35fr 1fr;gap:24px;padding:0 28px 28px;max-width:1250px;margin:auto}
-.stage{background:radial-gradient(ellipse at 50% 70%,#fff 0%,var(--paper) 55%,#d8d4cb 100%);border-radius:28px;position:relative;min-height:470px;display:flex;align-items:center;justify-content:center;overflow:hidden}
-.stage svg{width:92%;transform:rotate(-6deg);filter:drop-shadow(0 22px 18px rgba(0,0,0,.18));transition:transform .4s}
-.stage:hover svg{transform:rotate(-2deg) scale(1.03)}
-.name{position:absolute;top:22px;left:26px;background:none;border:0;border-bottom:2px dashed #b9b3a6;font:800 28px Syne,sans-serif;color:var(--ink);width:70%;padding:2px 0;outline:none}
-.name:focus{border-color:var(--coral)}
-.badge{position:absolute;right:22px;top:22px;text-align:right;color:var(--ink);font-weight:600}
-.badge span{display:inline-block;padding:6px 14px;border-radius:99px;color:#fff;font-size:13px}
-.hype{position:absolute;left:26px;right:26px;bottom:22px;color:var(--ink);font-size:13px;font-weight:600}
-.bar{height:10px;background:#d4d0c6;border-radius:9px;margin-top:6px;overflow:hidden}
-.bar i{display:block;height:100%;background:linear-gradient(90deg,var(--coral),#ffb400);border-radius:9px;transition:width .4s}
-.panel{background:var(--ink2);border-radius:28px;padding:24px;display:flex;flex-direction:column;gap:18px}
-h3{font:700 15px Inter;color:var(--mut);margin-bottom:10px}
-.chips,.sw,.seg{display:flex;flex-wrap:wrap;gap:8px}
-.chip,.seg button{background:transparent;border:1px solid var(--line);color:#fff;padding:8px 14px;border-radius:99px;font:600 13px Inter;cursor:pointer}
-.chip.on,.seg button.on{background:#fff;color:var(--ink);border-color:#fff}
-.sw button{width:34px;height:34px;border-radius:50%;border:2px solid var(--line);cursor:pointer}
-.sw button.on{outline:3px solid #fff;outline-offset:2px}
-.sw input{width:34px;height:34px;border:0;padding:0;background:none;cursor:pointer}
-select{background:var(--ink);color:#fff;border:1px solid var(--line);padding:8px 12px;border-radius:12px;font:600 13px Inter}
-.acts{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-.btn{padding:13px;border-radius:14px;border:0;font:700 14px Inter;cursor:pointer;background:var(--line);color:#fff}
-.btn.pri{background:var(--coral)}
-.btn.wide{grid-column:1/3}
-.btn:hover{filter:brightness(1.12)}
-:focus-visible{outline:3px solid #ffb400;outline-offset:2px}
+.who{display:flex;gap:10px;align-items:center;font-weight:600}
+.tabs{display:flex;gap:8px;padding:18px 28px;max-width:1250px;margin:auto}
+.tab{background:transparent;border:1px solid var(--line);color:#fff;padding:10px 20px;border-radius:99px;font:700 14px Inter;cursor:pointer;text-decoration:none}
+.tab.on{background:#fff;color:var(--ink)}
 .locker{max-width:1250px;margin:0 auto;padding:0 28px 60px}
 .locker h2{font:800 24px Syne;margin-bottom:14px}
 .cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:14px}
-.card{background:var(--ink2);border-radius:20px;padding:12px;cursor:pointer;position:relative;border:1px solid transparent}
+.card{background:var(--ink2);border-radius:20px;padding:12px;position:relative;border:1px solid transparent}
 .card:hover{border-color:var(--coral)}
 .card .pic{background:var(--paper);border-radius:14px;padding:8px}
 .card p{font-weight:600;margin:10px 4px 0;font-size:14px}
-.card small{color:var(--mut);margin:0 4px}
-.card .x{position:absolute;top:18px;right:18px;background:var(--ink);color:#fff;border:0;border-radius:50%;width:26px;height:26px;cursor:pointer}
+.card small{color:var(--mut);margin:0 4px;display:block}
 .empty{color:var(--mut)}
 #toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(80px);background:#fff;color:var(--ink);padding:12px 20px;border-radius:14px;font-weight:600;transition:transform .3s;z-index:9}
 #toast.show{transform:translateX(-50%)}
-.who{display:flex;gap:10px;align-items:center;font-weight:600}
-.tabs{display:flex;gap:8px;padding:0 28px 18px;max-width:1250px;margin:auto}
-.tab{background:transparent;border:1px solid var(--line);color:#fff;padding:10px 20px;border-radius:99px;font:700 14px Inter;cursor:pointer}
-.tab.on{background:#fff;color:var(--ink)}
-.view[hidden],#v-studio[hidden]{display:none}
-.row{display:flex;gap:8px;margin:10px 4px 2px}.row .btn{padding:9px 16px;font-size:13px}
+.btn{padding:10px 16px;border-radius:12px;border:0;font:700 13px Inter;cursor:pointer;background:var(--line);color:#fff}
+.btn.pri{background:var(--coral)}
+.row{display:flex;gap:8px;margin-top:10px}
 .ov{position:fixed;inset:0;background:rgba(0,0,0,.55);display:none;align-items:center;justify-content:center;z-index:10}
 .ov.on{display:flex}
 .imp{background:var(--ink2);border-radius:20px;padding:28px;max-width:420px;width:100%;position:relative;border:1px solid var(--line)}
 .imp input{width:100%;padding:11px;border:1px solid var(--line);border-radius:10px;margin:8px 0 14px;font:inherit;background:var(--ink);color:#fff}
-@media(max-width:860px){main{grid-template-columns:1fr;padding:0 16px 20px}.stage{min-height:360px}.locker{padding:0 16px 50px}}
-@media(prefers-reduced-motion:reduce){*{transition:none!important}}
+@media(max-width:860px){.locker{padding:0 16px 50px}}
 </style>
 </head>
 <body>
 <header>
   <div class="logo">Sole<b>Smith</b></div>
-  <div class="chal">Today's challenge: <strong id="chal"></strong></div>
   <div class="who"><span id="coins"></span><button class="btn pri" id="auth-btn">Sign in</button></div>
 </header>
-<div class="tabs"><button class="tab on" data-v="studio">Studio</button><button class="tab" data-v="inv">My inventory</button><button class="tab" data-v="mkt">Player market</button><a class="tab" id="shop" href="#" style="text-decoration:none">Shop at SoleX</a></div>
-<div id="v-studio"><main>
-  <section class="stage">
-    <input class="name" id="name" maxlength="24" aria-label="Shoe name">
-    <div class="badge"><span id="rar"></span></div>
-    <div id="shoe" style="width:100%;display:flex;justify-content:center"></div>
-    <div class="hype"><div>Hype score: <span id="sc"></span> / 99</div><div class="bar"><i id="bar"></i></div></div>
-  </section>
-  <section class="panel">
-    <div><h3>Pick a part</h3><div class="chips" id="parts"></div></div>
-    <div><h3>Pick a color</h3><div class="sw" id="sw"></div></div>
-    <div><h3>Finish</h3><div class="seg" id="fin"></div></div>
-    <div><h3>Size (US)</h3><select id="size"></select></div>
-    <div class="acts">
-      <button class="btn" id="rnd">Randomize</button>
-      <button class="btn pri" id="save">Save sketch</button>
-    </div>
-  </section>
-</main>
-<section class="locker">
-  <h2>Sketchbook</h2><p class="empty" style="margin-bottom:12px">Studio designs are just for fun and only saved on this device. Real shoes come from SoleX.</p>
-  <div class="cards" id="locker"></div>
-</section>
+<div class="tabs">
+  <button class="tab on" data-v="inv">My inventory</button>
+  <button class="tab" data-v="mkt">Player market</button>
+  <a class="tab" href="https://mohamednaser2143-sudo.github.io/solex/">Shop at SoleX</a>
 </div>
-<section class="view locker" id="v-inv" hidden><h2>My inventory</h2><p class="empty" id="invmsg"></p><div class="cards" id="inv"></div></section>
-<section class="view locker" id="v-mkt" hidden><h2>Player market</h2><p class="empty" id="mktmsg"></p><div class="cards" id="mkt"></div></section>
+
+<section class="locker view" id="v-inv">
+  <h2>My inventory</h2>
+  <p class="empty" id="invmsg"></p>
+  <div class="cards" id="inv"></div>
+</section>
+
+<section class="locker view" id="v-mkt" hidden>
+  <h2>Player market</h2>
+  <p class="empty" id="mktmsg"></p>
+  <div class="cards" id="mkt"></div>
+</section>
 
 <div class="ov" id="auth-ov">
   <div class="imp">
@@ -114,19 +75,12 @@ select{background:var(--ink);color:#fff;border:1px solid var(--line);padding:8px
   </div>
 </div>
 <div id="toast"></div>
+
 <script>
 const $=s=>document.querySelector(s);
 const SUPABASE_URL="https://xqftxszpozrpuzhsnyho.supabase.co";
 const SUPABASE_ANON_KEY="sb_publishable_IBatpScfMC8L4Ys93DQWMg_GJKLyD3B";
-const OTHER_URL="https://mohamednaser2143-sudo.github.io/solex/";
-
 const supabase=supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY);
-const PARTS=['Upper','Toe','Heel','Stripe','Laces','Midsole','Sole'];
-const PAL=['#ffffff','#0b0b0f','#e63946','#ff7a1a','#ffd23f','#2ecc71','#00c2a8','#2e86ff','#6c3cff','#ff4fa3','#b5b5c3','#7a4a2b','#f2e3c6','#c0ff3d'];
-const FIN=['matte','glossy','glitter'];
-const CHAL=['Sunset Chaser','Ice Cold','Street King','Candy Shop','Night Shift','Forest Run','Gold Rush','Retro Court'];
-const RC={Common:'#8a8497',Rare:'#2e86ff',Epic:'#a855f7',Legendary:'#e08a00'};
-let S={n:'My First Kicks',c:['#ffffff','#e63946','#0b0b0f','#0b0b0f','#ffffff','#ffffff','#0b0b0f'],f:'matte',z:'10'},sel=0;
 
 function shoeSVG(c,f){
  const UP='M40 148 L38 66 Q40 50 62 50 L100 52 Q118 92 150 96 L165 60 L200 58 L215 92 Q330 98 372 132 Q390 146 388 150 Z';
@@ -146,53 +100,13 @@ function shoeSVG(c,f){
  <path d="M150 96 L165 60 L200 58 L215 92 Q182 102 150 96 Z" fill="#000" opacity=".12"/>
  </g>${laces}${fx}</svg>`;
 }
-function score(d){let h=0;(d.n+d.c.join()+d.f).split('').forEach(ch=>h=(h*31+ch.charCodeAt(0))%97);
- return Math.min(99,35+new Set(d.c).size*7+h%20+(d.f!=='matte'?8:0))}
-const rarity=s=>s>=85?'Legendary':s>=70?'Epic':s>=55?'Rare':'Common';
 function toast(t){const e=$('#toast');e.textContent=t;e.classList.add('show');setTimeout(()=>e.classList.remove('show'),2200)}
-const getL=()=>{try{return JSON.parse(localStorage.getItem('solesmith_locker')||'[]')}catch(e){return[]}};
-const setL=a=>{try{localStorage.setItem('solesmith_locker',JSON.stringify(a))}catch(e){}};
 
-function render(){
- $('#shoe').innerHTML=shoeSVG(S.c,S.f);
- const s=score(S),r=rarity(s);
- $('#sc').textContent=s;$('#bar').style.width=s+'%';
- const b=$('#rar');b.textContent=r;b.style.background=RC[r];
- document.querySelectorAll('#parts .chip').forEach((e,i)=>e.classList.toggle('on',i===sel));
- document.querySelectorAll('#sw button').forEach(e=>e.classList.toggle('on',e.dataset.c===S.c[sel]));
- document.querySelectorAll('#fin button').forEach(e=>e.classList.toggle('on',e.dataset.f===S.f));
- $('#size').value=S.z;
-}
-function lockerRender(){
- const L=getL(),box=$('#locker');
- if(!L.length){box.innerHTML='<p class="empty">Nothing here yet. Design a shoe and press Save sketch.</p>';return}
- box.innerHTML=L.map((d,i)=>`<div class="card" data-i="${i}"><button class="x" data-x="${i}" aria-label="Delete">x</button><div class="pic">${shoeSVG(d.c,d.f)}</div><p>${d.n.replace(/</g,'&lt;')}</p><small>${rarity(score(d))} &middot; Hype ${score(d)}</small></div>`).join('');
-}
-$('#chal').textContent=CHAL[Math.floor(Math.random()*CHAL.length)];
-$('#name').value=S.n;
-$('#name').oninput=e=>{S.n=e.target.value;render()};
-$('#parts').innerHTML=PARTS.map((p,i)=>`<button class="chip" data-i="${i}">${p}</button>`).join('');
-$('#parts').onclick=e=>{if(e.target.dataset.i){sel=+e.target.dataset.i;render()}};
-$('#sw').innerHTML=PAL.map(c=>`<button data-c="${c}" style="background:${c}" aria-label="${c}"></button>`).join('')+'<input type="color" id="cc" aria-label="Custom color">';
-$('#sw').onclick=e=>{if(e.target.dataset.c){S.c[sel]=e.target.dataset.c;render()}};
-$('#cc').oninput=e=>{S.c[sel]=e.target.value;render()};
-$('#fin').innerHTML=FIN.map(f=>`<button data-f="${f}">${f[0].toUpperCase()+f.slice(1)}</button>`).join('');
-$('#fin').onclick=e=>{if(e.target.dataset.f){S.f=e.target.dataset.f;render()}};
-$('#size').innerHTML=[6,7,8,9,10,11,12,13].map(n=>`<option>${n}</option>`).join('');
-$('#size').onchange=e=>{S.z=e.target.value};
-$('#rnd').onclick=()=>{S.c=S.c.map(()=>PAL[Math.floor(Math.random()*PAL.length)]);S.f=FIN[Math.floor(Math.random()*3)];render()};
-$('#save').onclick=()=>{const L=getL();L.unshift({n:S.n||'Untitled',c:[...S.c],f:S.f});setL(L.slice(0,24));lockerRender();toast('Sketch saved')};
-$('#locker').onclick=e=>{
- if(e.target.dataset.x!==undefined){const L=getL();L.splice(+e.target.dataset.x,1);setL(L);lockerRender();return}
- const c=e.target.closest('.card');if(c){const d=getL()[+c.dataset.i];S={n:d.n,c:[...d.c],f:d.f,z:S.z};$('#name').value=S.n;render();scrollTo({top:0,behavior:'smooth'})}
-};
-
-$('#shop').href=OTHER_URL;
 let me=null,coins=0,INV={},MK={},isReg=false;
 
 document.querySelectorAll(".tab[data-v]").forEach(b=>b.onclick=()=>{
  document.querySelectorAll(".tab[data-v]").forEach(t=>t.classList.toggle("on",t===b));
- ["studio","inv","mkt"].forEach(v=>$("#v-"+v).hidden=v!==b.dataset.v);
+ ["inv","mkt"].forEach(v=>$("#v-"+v).hidden=v!==b.dataset.v);
 });
 
 async function checkAuth(){
@@ -200,7 +114,12 @@ async function checkAuth(){
  me=user;
  if(me){
   const {data}=await supabase.from('users').select('coins').eq('id',me.id).single();
-  if(data) coins=data.coins;
+  if(data){
+   coins=data.coins;
+  }else{
+   await supabase.from('users').insert({id:me.id,name:me.email.split('@')[0],coins:1000});
+   coins=1000;
+  }
   loadData();
  }else{coins=0;INV={};MK={};}
  paint();
@@ -211,11 +130,11 @@ function paint(){
  $('#coins').textContent=me?coins.toLocaleString()+" coins":"";
  const k=Object.keys(INV);
  $('#inv').innerHTML=k.map(id=>{const d=INV[id];return `<div class="card"><div class="pic">${shoeSVG(d.c,d.f)}</div><p>${d.n}</p><small>Size ${d.z} &middot; ${d.r}</small><div class="row"><button class="btn pri" data-sell="${id}">Sell</button></div></div>`}).join("");
- $('#invmsg').innerHTML=!me?"Sign in to see your shoes.":k.length?"":`Nothing yet. <a href="${OTHER_URL}" style="color:var(--coral)">Buy your first pair at SoleX</a>.`;
+ $('#invmsg').innerHTML=!me?"Sign in to see your shoes.":k.length?"":`Nothing in your inventory yet. <a href="https://mohamednaser2143-sudo.github.io/solex/" style="color:var(--coral)">Buy your first pair at SoleX</a>.`;
  
  const m=Object.keys(MK);
  $('#mkt').innerHTML=m.map(id=>{const d=MK[id],own=me&&d.seller===me.id;return `<div class="card"><div class="pic">${shoeSVG(d.shoe.c,d.shoe.f)}</div><p>${d.shoe.n}</p><small>Size ${d.shoe.z} &middot; ${d.price.toLocaleString()} coins &middot; ${d.sn}</small><div class="row"><button class="btn ${own?"":"pri"}" data-id="${id}" data-a="${own?"x":"b"}">${own?"Cancel":"Buy"}</button></div></div>`}).join("");
- $('#mktmsg').textContent=!me?"Sign in to see listings.":m.length?"":"No listings yet. Sell a shoe from your inventory.";
+ $('#mktmsg').textContent=!me?"Sign in to see listings.":m.length?"":"No active player listings right now.";
 }
 
 async function loadData(){
@@ -297,7 +216,6 @@ supabase.channel('public:listings')
  .subscribe();
 
 checkAuth();
-render();lockerRender();
 </script>
 </body>
 </html>
