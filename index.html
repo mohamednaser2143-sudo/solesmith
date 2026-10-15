@@ -5,9 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>SoleSmith - Design Your Own Sneaker</title>
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=Inter:wght@400;600&display=swap" rel="stylesheet">
-<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
 :root{--ink:#1b1626;--ink2:#2a2338;--paper:#efece6;--coral:#ff5a36;--line:#3a3150;--mut:#a79fba}
 *{box-sizing:border-box;margin:0}
@@ -61,6 +59,10 @@ select{background:var(--ink);color:#fff;border:1px solid var(--line);padding:8px
 .tab.on{background:#fff;color:var(--ink)}
 .view[hidden],#v-studio[hidden]{display:none}
 .row{display:flex;gap:8px;margin:10px 4px 2px}.row .btn{padding:9px 16px;font-size:13px}
+.ov{position:fixed;inset:0;background:rgba(0,0,0,.55);display:none;align-items:center;justify-content:center;z-index:10}
+.ov.on{display:flex}
+.imp{background:var(--ink2);border-radius:20px;padding:28px;max-width:420px;width:100%;position:relative;border:1px solid var(--line)}
+.imp input{width:100%;padding:11px;border:1px solid var(--line);border-radius:10px;margin:8px 0 14px;font:inherit;background:var(--ink);color:#fff}
 @media(max-width:860px){main{grid-template-columns:1fr;padding:0 16px 20px}.stage{min-height:360px}.locker{padding:0 16px 50px}}
 @media(prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
@@ -69,7 +71,7 @@ select{background:var(--ink);color:#fff;border:1px solid var(--line);padding:8px
 <header>
   <div class="logo">Sole<b>Smith</b></div>
   <div class="chal">Today's challenge: <strong id="chal"></strong></div>
-<div class="who"><span id="coins"></span><button class="btn pri" id="auth">Sign in with Google</button></div>
+  <div class="who"><span id="coins"></span><button class="btn pri" id="auth-btn">Sign in</button></div>
 </header>
 <div class="tabs"><button class="tab on" data-v="studio">Studio</button><button class="tab" data-v="inv">My inventory</button><button class="tab" data-v="mkt">Player market</button><a class="tab" id="shop" href="#" style="text-decoration:none">Shop at SoleX</a></div>
 <div id="v-studio"><main>
@@ -87,7 +89,6 @@ select{background:var(--ink);color:#fff;border:1px solid var(--line);padding:8px
     <div class="acts">
       <button class="btn" id="rnd">Randomize</button>
       <button class="btn pri" id="save">Save sketch</button>
-      
     </div>
   </section>
 </main>
@@ -98,9 +99,28 @@ select{background:var(--ink);color:#fff;border:1px solid var(--line);padding:8px
 </div>
 <section class="view locker" id="v-inv" hidden><h2>My inventory</h2><p class="empty" id="invmsg"></p><div class="cards" id="inv"></div></section>
 <section class="view locker" id="v-mkt" hidden><h2>Player market</h2><p class="empty" id="mktmsg"></p><div class="cards" id="mkt"></div></section>
+
+<div class="ov" id="auth-ov">
+  <div class="imp">
+    <button class="btn" id="auth-x" style="position:absolute;right:18px;top:18px;width:30px;height:30px;padding:0">&times;</button>
+    <h2 id="auth-title" style="font-family:Syne;margin-bottom:6px">Sign In</h2>
+    <p style="color:var(--mut);font-size:13px;margin-bottom:14px">Sign in to sync your inventory and player market.</p>
+    <label style="font-size:12px;font-weight:600">Email</label>
+    <input type="email" id="email-in" placeholder="player@example.com">
+    <label style="font-size:12px;font-weight:600">Password</label>
+    <input type="password" id="pass-in" placeholder="••••••••">
+    <button class="btn pri" id="auth-sub" style="width:100%">Continue</button>
+    <p style="text-align:center;margin-top:14px;font-size:13px;color:var(--mut);cursor:pointer" id="auth-switch">Need an account? Register</p>
+  </div>
+</div>
 <div id="toast"></div>
 <script>
 const $=s=>document.querySelector(s);
+const SUPABASE_URL="https://xqftxszpozrpuzhsnyho.supabase.co";
+const SUPABASE_ANON_KEY="sb_publishable_IBatpScfMC8L4Ys93DQWMg_GJKLyD3B";
+const OTHER_URL="https://mohamednaser2143-sudo.github.io/solex/";
+
+const supabase=supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY);
 const PARTS=['Upper','Toe','Heel','Stripe','Laces','Midsole','Sole'];
 const PAL=['#ffffff','#0b0b0f','#e63946','#ff7a1a','#ffd23f','#2ecc71','#00c2a8','#2e86ff','#6c3cff','#ff4fa3','#b5b5c3','#7a4a2b','#f2e3c6','#c0ff3d'];
 const FIN=['matte','glossy','glitter'];
@@ -148,7 +168,6 @@ function lockerRender(){
  if(!L.length){box.innerHTML='<p class="empty">Nothing here yet. Design a shoe and press Save sketch.</p>';return}
  box.innerHTML=L.map((d,i)=>`<div class="card" data-i="${i}"><button class="x" data-x="${i}" aria-label="Delete">x</button><div class="pic">${shoeSVG(d.c,d.f)}</div><p>${d.n.replace(/</g,'&lt;')}</p><small>${rarity(score(d))} &middot; Hype ${score(d)}</small></div>`).join('');
 }
-// build controls
 $('#chal').textContent=CHAL[Math.floor(Math.random()*CHAL.length)];
 $('#name').value=S.n;
 $('#name').oninput=e=>{S.n=e.target.value;render()};
@@ -167,49 +186,117 @@ $('#locker').onclick=e=>{
  if(e.target.dataset.x!==undefined){const L=getL();L.splice(+e.target.dataset.x,1);setL(L);lockerRender();return}
  const c=e.target.closest('.card');if(c){const d=getL()[+c.dataset.i];S={n:d.n,c:[...d.c],f:d.f,z:S.z};$('#name').value=S.n;render();scrollTo({top:0,behavior:'smooth'})}
 };
-render();lockerRender();
-const FB={apiKey:"PASTE_HERE",authDomain:"PASTE_HERE",databaseURL:"PASTE_HERE",projectId:"PASTE_HERE",appId:"PASTE_HERE"};
-const OTHER_URL="https://YOUR-NAME.github.io/REPO-NAME/";
-let auth,db;try{firebase.initializeApp(FB);auth=firebase.auth();db=firebase.database()}catch(e){console.warn("Add your Firebase config",e);auth={onAuthStateChanged(){},signOut(){},signInWithPopup(){return Promise.reject({code:"add-your-firebase-config"})}}}
-const esc=t=>String(t).replace(/[<>&"]/g,"");
-let me=null,coins=0;
-$("#auth").onclick=()=>me?auth.signOut():auth.signInWithPopup(new firebase.auth.GoogleAuthProvider()).catch(e=>toast("Sign in failed: "+e.code));
-$("#shop").href=OTHER_URL;
-let INV={},MK={},wired=false;const done=new Set();
-document.querySelectorAll(".tab[data-v]").forEach(b=>b.onclick=()=>{document.querySelectorAll(".tab[data-v]").forEach(t=>t.classList.toggle("on",t===b));["studio","inv","mkt"].forEach(v=>$("#v-"+v).hidden=v!==b.dataset.v)});
-function paint(){
- $("#auth").textContent=me?"Sign out":"Sign in with Google";$("#coins").textContent=me?coins.toLocaleString()+" coins":"";
- const k=Object.keys(INV);
- $("#inv").innerHTML=k.map(id=>{const d=INV[id];return `<div class="card"><div class="pic">${shoeSVG(d.c,d.f)}</div><p>${esc(d.n)}</p><small>Size ${esc(d.z)} &middot; ${esc(d.r)}</small><div class="row"><button class="btn pri" data-sell="${id}">Sell</button></div></div>`}).join("");
- $("#invmsg").innerHTML=!me?"Sign in to see your shoes.":k.length?"":`Nothing yet. <a href="${OTHER_URL}" style="color:#ff5a36">Buy your first pair at SoleX</a>.`;
- const m=Object.keys(MK);
- $("#mkt").innerHTML=m.map(id=>{const d=MK[id],s=d.shoe,own=me&&d.seller===me.uid;return `<div class="card"><div class="pic">${shoeSVG(s.c,s.f)}</div><p>${esc(s.n)}</p><small>Size ${esc(s.z)} &middot; ${d.price.toLocaleString()} coins &middot; ${esc(d.sn)}</small><div class="row"><button class="btn ${own?"":"pri"}" data-id="${id}" data-a="${own?"x":"b"}">${own?"Cancel":"Buy"}</button></div></div>`}).join("");
- $("#mktmsg").textContent=!me?"Sign in to see listings.":m.length?"":"No listings yet. Sell a shoe from your inventory.";
+
+$('#shop').href=OTHER_URL;
+let me=null,coins=0,INV={},MK={},isReg=false;
+
+document.querySelectorAll(".tab[data-v]").forEach(b=>b.onclick=()=>{
+ document.querySelectorAll(".tab[data-v]").forEach(t=>t.classList.toggle("on",t===b));
+ ["studio","inv","mkt"].forEach(v=>$("#v-"+v).hidden=v!==b.dataset.v);
+});
+
+async function checkAuth(){
+ const {data:{user}}=await supabase.auth.getUser();
+ me=user;
+ if(me){
+  const {data}=await supabase.from('users').select('coins').eq('id',me.id).single();
+  if(data) coins=data.coins;
+  loadData();
+ }else{coins=0;INV={};MK={};}
+ paint();
 }
-$("#inv").onclick=async e=>{const id=e.target.dataset.sell;if(!id||!INV[id])return;
+
+function paint(){
+ $('#auth-btn').textContent=me?"Sign out":"Sign in";
+ $('#coins').textContent=me?coins.toLocaleString()+" coins":"";
+ const k=Object.keys(INV);
+ $('#inv').innerHTML=k.map(id=>{const d=INV[id];return `<div class="card"><div class="pic">${shoeSVG(d.c,d.f)}</div><p>${d.n}</p><small>Size ${d.z} &middot; ${d.r}</small><div class="row"><button class="btn pri" data-sell="${id}">Sell</button></div></div>`}).join("");
+ $('#invmsg').innerHTML=!me?"Sign in to see your shoes.":k.length?"":`Nothing yet. <a href="${OTHER_URL}" style="color:var(--coral)">Buy your first pair at SoleX</a>.`;
+ 
+ const m=Object.keys(MK);
+ $('#mkt').innerHTML=m.map(id=>{const d=MK[id],own=me&&d.seller===me.id;return `<div class="card"><div class="pic">${shoeSVG(d.shoe.c,d.shoe.f)}</div><p>${d.shoe.n}</p><small>Size ${d.shoe.z} &middot; ${d.price.toLocaleString()} coins &middot; ${d.sn}</small><div class="row"><button class="btn ${own?"":"pri"}" data-id="${id}" data-a="${own?"x":"b"}">${own?"Cancel":"Buy"}</button></div></div>`}).join("");
+ $('#mktmsg').textContent=!me?"Sign in to see listings.":m.length?"":"No listings yet. Sell a shoe from your inventory.";
+}
+
+async function loadData(){
+ if(!me)return;
+ const {data: invData}=await supabase.from('inventory').select('*').eq('user_id',me.id);
+ INV={};if(invData)invData.forEach(item=>INV[item.id]=item);
+ 
+ const {data: mktData}=await supabase.from('listings').select('*');
+ MK={};if(mktData)mktData.forEach(item=>MK[item.id]=item);
+ paint();
+}
+
+$('#auth-btn').onclick=async()=>{
+ if(me){await supabase.auth.signOut();me=null;checkAuth();toast("Signed out");return;}
+ $('#auth-ov').classList.add('on');
+};
+$('#auth-x').onclick=()=>$('#auth-ov').classList.remove('on');
+$('#auth-switch').onclick=()=>{
+ isReg=!isReg;
+ $('#auth-title').textContent=isReg?"Create Account":"Sign In";
+ $('#auth-sub').textContent=isReg?"Register":"Sign In";
+ $('#auth-switch').textContent=isReg?"Already have an account? Sign in":"Need an account? Register";
+};
+$('#auth-sub').onclick=async()=>{
+ const em=$('#email-in').value,pw=$('#pass-in').value;
+ if(!em||!pw)return toast("Enter email and password");
+ if(isReg){
+  const {error}=await supabase.auth.signUp({email:em,password:pw});
+  if(error)return toast(error.message);
+  toast("Account created! You can now sign in.");
+  isReg=false;$('#auth-title').textContent="Sign In";$('#auth-sub').textContent="Sign In";
+ }else{
+  const {error}=await supabase.auth.signInWithPassword({email:em,password:pw});
+  if(error)return toast(error.message);
+  $('#auth-ov').classList.remove('on');
+  toast("Signed in successfully");
+  checkAuth();
+ }
+};
+
+$('#inv').onclick=async e=>{
+ const id=e.target.dataset.sell;if(!id||!INV[id])return;
  const p=Math.round(+prompt("Sell for how many coins?","500"));if(!(p>0))return;
- await db.ref("listings").push({seller:me.uid,sn:me.displayName||"Player",shoe:INV[id],price:p,ts:Date.now()});
- await db.ref("inv/"+me.uid+"/"+id).remove();toast("Listed on the player market")};
-$("#mkt").onclick=async e=>{const b=e.target.closest("button");if(!b||!me)return;const id=b.dataset.id,L=MK[id];if(!L)return;
- const take=()=>db.ref("listings/"+id).transaction(v=>v?null:undefined);
- if(b.dataset.a==="x"){const t=await take();if(!t.committed)return;await db.ref("inv/"+me.uid).push(L.shoe);return toast("Shoe is back in your inventory")}
- const r=await db.ref("users/"+me.uid+"/coins").transaction(v=>(v||0)>=L.price?v-L.price:undefined);
- if(!r.committed)return toast("Not enough coins");
- const t=await take();
- if(!t.committed){await db.ref("users/"+me.uid+"/coins").transaction(v=>(v||0)+L.price);return toast("Someone else got it first")}
- await db.ref("inv/"+me.uid).push({...L.shoe,paid:L.price,ts:Date.now()});
- await db.ref("payouts/"+L.seller).push({amt:L.price,n:L.shoe.n});toast("You bought "+L.shoe.n)};
-async function claim(s){const p=s.val();if(!p||!me)return;
- for(const k in p){if(done.has(k))continue;done.add(k);
-  await db.ref("payouts/"+me.uid+"/"+k).remove();
-  await db.ref("users/"+me.uid+"/coins").transaction(v=>(v||0)+p[k].amt);toast("Sold "+p[k].n+" for "+p[k].amt+" coins")}}
-auth.onAuthStateChanged(async u=>{me=u;if(!u){coins=0;INV={};paint();return}
- const r=db.ref("users/"+u.uid),s=await r.get();if(!s.exists())await r.set({name:u.displayName||"Player",coins:1000});
- r.child("coins").on("value",v=>{coins=v.val()||0;paint()});
- db.ref("inv/"+u.uid).on("value",v=>{INV=v.val()||{};paint()});
- db.ref("payouts/"+u.uid).on("value",claim);
- if(!wired){wired=true;db.ref("listings").on("value",v=>{MK=v.val()||{};paint()})}});
-paint();
+ const item=INV[id];
+ await supabase.from('listings').insert({seller:me.id,sn:me.email.split('@')[0],shoe:{n:item.n,c:item.c,f:item.f,z:item.z},price:p,ts:Date.now()});
+ await supabase.from('inventory').delete().eq('id',id);
+ toast("Listed on the player market");
+ loadData();
+};
+
+$('#mkt').onclick=async e=>{
+ const b=e.target.closest("button");if(!b||!me)return;const id=b.dataset.id,L=MK[id];if(!L)return;
+ if(b.dataset.a==="x"){
+  await supabase.from('listings').delete().eq('id',id);
+  await supabase.from('inventory').insert({user_id:me.id,n:L.shoe.n,c:L.shoe.c,f:L.shoe.f,z:L.shoe.z,r:'Epic',paid:0,ts:Date.now()});
+  toast("Shoe returned to inventory");
+  loadData();
+  return;
+ }
+ if(coins<L.price)return toast("Not enough coins");
+ 
+ const newCoins=coins-L.price;
+ await supabase.from('users').update({coins:newCoins}).eq('id',me.id);
+ 
+ const {data: sellerData}=await supabase.from('users').select('coins').eq('id',L.seller).single();
+ if(sellerData){
+  await supabase.from('users').update({coins:sellerData.coins+L.price}).eq('id',L.seller);
+ }
+
+ await supabase.from('inventory').insert({user_id:me.id,n:L.shoe.n,c:L.shoe.c,f:L.shoe.f,z:L.shoe.z,r:'Epic',paid:L.price,ts:Date.now()});
+ await supabase.from('listings').delete().eq('id',id);
+
+ toast("You bought "+L.shoe.n);
+ checkAuth();
+};
+
+supabase.channel('public:listings')
+ .on('postgres_changes',{event:'*',schema:'public',table:'listings'},()=>loadData())
+ .subscribe();
+
+checkAuth();
 render();lockerRender();
 </script>
 </body>
