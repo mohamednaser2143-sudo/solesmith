@@ -39,6 +39,8 @@ h2{font:800 26px Syne;margin-bottom:8px}
 .mbar{height:10px;background:var(--ink);border-radius:9px;margin:12px 4px 0;overflow:hidden}.mbar i{display:block;height:100%;background:linear-gradient(90deg,var(--coral),#ffb400)}
 .lbr{display:grid;grid-template-columns:50px 1fr 130px 210px;gap:10px;align-items:center;background:var(--ink2);padding:13px 16px;border-radius:14px;margin-bottom:8px}.lbr.me{outline:2px solid var(--coral)}.lbr small{color:var(--mut)}
 @media(max-width:700px){.lbr{grid-template-columns:40px 1fr 100px}.lbr small{display:none}}
+.colset{background:var(--ink2);border-radius:20px;padding:16px;margin-bottom:16px}.colh{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:12px}.colh h3{font:800 20px Syne;margin:0}.colh small{color:var(--mut)}
+.colg{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px}.cs{background:var(--paper);border-radius:12px;padding:8px;color:var(--ink);text-align:center}.cs small{font-weight:600;font-size:11px;display:block}
 :focus-visible{outline:3px solid #ffb400;outline-offset:2px}
 #toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(90px);background:#fff;color:var(--ink);padding:12px 20px;border-radius:14px;font-weight:600;transition:transform .3s;z-index:20;max-width:90vw}
 #toast.show{transform:translateX(-50%)}
@@ -56,7 +58,9 @@ h2{font:800 26px Syne;margin-bottom:8px}
   <button class="tab" data-v="wk">Workers</button>
   <button class="tab" data-v="ms">Missions</button>
   <button class="tab" data-v="lb">Leaderboard</button>
+  <button class="tab" data-v="col">Collections</button>
   <a class="tab" href="https://mohamednaser2143-sudo.github.io/solex/">Shop at SoleX</a>
+  <a class="tab" href="how-to-play.html">How to play</a>
   <a class="tab" id="adm" href="admin.html" hidden>Admin</a>
 </div>
 <section class="view" id="v-inv"><h2>My inventory</h2><p class="msg" id="invmsg"></p><div class="cards" id="inv"></div></section>
@@ -65,6 +69,7 @@ h2{font:800 26px Syne;margin-bottom:8px}
 <section class="view" id="v-wk" hidden><h2>Workers</h2><p class="msg">Hire up to 5 workers. The more expensive the worker, the more they pay: 30, 45, 60, 80 and 100 coins every 2 minutes.</p><div id="wk"></div></section>
 <section class="view" id="v-ms" hidden><h2>Daily missions</h2><p class="msg">Finish missions to earn coins. They reset every day (UTC).</p><div class="cards" id="ms"></div></section>
 <section class="view" id="v-lb" hidden><h2>Leaderboard</h2><p class="msg">Ranked by net worth: your coins plus the value of every shoe you own.</p><div id="lb"></div></section>
+<section class="view" id="v-col" hidden><h2>Collections</h2><p class="msg">Own all 10 shoes of a set to claim its prize. Each set has one GRAIL shoe that only comes from a drop. Only one of each grail exists in the whole game, and it can only be sold to other players. You keep your shoes after claiming.</p><div id="col"></div></section>
 <div class="ov" id="om"><div class="am"><h2>Offers</h2><p class="msg">Pick an offer. Offers expire in 3 minutes.</p><div id="ol"></div></div></div>
 <div class="ov" id="am"><div class="am">
   <h2>Welcome</h2><p class="msg">Create an account and start with 1,000 coins.</p>
@@ -77,11 +82,11 @@ h2{font:800 26px Syne;margin-bottom:8px}
 const $=s=>document.querySelector(s);
 const SB=supabase.createClient("https://xqftxszpozrpuzhsnyho.supabase.co","sb_publishable_IBatpScfMC8L4Ys93DQWMg_GJKLyD3B");
 const SOLEX="https://mohamednaser2143-sudo.github.io/solex/";
-const RC={Common:'#8a8497',Rare:'#2e86ff',Epic:'#a855f7',Legendary:'#e08a00'};
+const RC={Common:'#8a8497',Rare:'#2e86ff',Epic:'#a855f7',Legendary:'#e08a00',Grail:'#e11d48'};
 const esc=t=>String(t==null?'':t).replace(/[<>&"]/g,'');
 function toast(t){const e=$('#toast');e.textContent=t;e.classList.add('show');setTimeout(()=>e.classList.remove('show'),2600)}
-function shoeSVG(c,f,n){
- n=n||'';const hi=n.startsWith('High '),bolt=/Lightning/.test(n);
+function shoeSVG(c,f,n,h){
+ n=n||'';const hi=!!h||n.startsWith('High '),bolt=/Lightning/.test(n);
  const UP=hi?'M40 148 L36 38 Q38 12 66 12 L116 14 Q136 22 146 54 L162 16 L204 12 L222 94 Q330 100 372 132 Q390 146 388 150 Z':'M40 148 L38 66 Q40 50 62 50 L100 52 Q118 92 150 96 L165 60 L200 58 L215 92 Q330 98 372 132 Q390 146 388 150 Z';
  const HEEL=hi?'M38 148 L36 38 Q38 12 66 12 L88 13 Q100 90 88 148 Z':'M38 148 L38 66 Q40 50 62 50 L82 51 Q96 100 86 148 Z';
  const TONG=hi?'M146 54 L162 16 L204 12 L222 94 Q184 104 150 96 Z':'M150 96 L165 60 L200 58 L215 92 Q182 102 150 96 Z';
@@ -107,23 +112,23 @@ function shoeSVG(c,f,n){
  <path d="${TONG}" fill="#000" opacity=".12"/>
  </g>${patch}${laces}${fx}</svg>`;
 }
-let me=null,prof=null,INV=[],MK=[],NW=null,LB=[],MS=[];
+let me=null,prof=null,INV=[],MK=[],NW=null,LB=[],MS=[],SETS=[],SHS=[],CL=[];
 async function load(){
  if(!me){prof=null;INV=[];MK=[];return paint()}
  await SB.rpc('collect');
- const [p,i,m,nw,lb,ms]=await Promise.all([
+ const [p,i,m,nw,lb,ms,st,sh,cc]=await Promise.all([
   SB.from('profiles').select('*').eq('id',me.id).single(),
   SB.from('inventory').select('*').order('id',{ascending:false}),
   SB.from('listings').select('*').order('id',{ascending:false}),
-  SB.rpc('my_networth'),SB.rpc('leaderboard'),SB.rpc('get_missions')]);
- prof=p.data;INV=i.data||[];MK=m.data||[];NW=nw.data;LB=lb.data||[];MS=ms.data||[];paint();
+  SB.rpc('my_networth'),SB.rpc('leaderboard'),SB.rpc('get_missions'),SB.from('sets').select('*'),SB.from('shop').select('name,colors,finish,hi,set_name,is_grail,taken').not('set_name','is',null),SB.from('collection_claims').select('set_name')]);
+ prof=p.data;INV=i.data||[];MK=m.data||[];NW=nw.data;LB=lb.data||[];MS=ms.data||[];SETS=st.data||[];SHS=sh.data||[];CL=(cc.data||[]).map(x=>x.set_name);paint();
 }
-function pic(s){return `<div class="pic"><span style="background:${RC[s.r]||RC.Common}">${esc(s.r)}</span>${shoeSVG(s.c,s.f,s.n)}</div>`}
+function pic(s){return `<div class="pic"><span style="background:${RC[s.r]||RC.Common}">${esc(s.r)}</span>${shoeSVG(s.c,s.f,s.n,s.h)}</div>`}
 function paint(){
  paint2();
  $('#auth').textContent=me?'Sign out':'Sign in';
  $('#coins').textContent=me&&prof?prof.coins.toLocaleString()+' coins':'';
- $('#inv').innerHTML=INV.map(d=>`<div class="card">${pic(d.shoe)}<p>${esc(d.shoe.n)}</p><small>Size ${esc(d.size)}${d.paid?' &middot; paid '+d.paid:''}${d.shoe.v?' &middot; worth '+d.shoe.v.toLocaleString():''}</small><div class="row"><button class="btn pri" data-offer="${d.id}">Get offers</button><button class="btn" style="margin-top:8px" data-sell="${d.id}">List for players</button></div></div>`).join('');
+ $('#inv').innerHTML=INV.map(d=>`<div class="card">${pic(d.shoe)}<p>${esc(d.shoe.n)}</p><small>Size ${esc(d.size)}${d.paid?' &middot; paid '+d.paid:''}${d.shoe.v?' &middot; worth '+d.shoe.v.toLocaleString():''}</small><div class="row">${d.shoe.g?'<small>GRAIL: can only be sold to players</small>':`<button class="btn pri" data-offer="${d.id}">Get offers</button>`}<button class="btn" style="margin-top:8px" data-sell="${d.id}">List for players</button></div></div>`).join('');
  $('#invmsg').innerHTML=!me?'Sign in to see your shoes.':INV.length?'':`Nothing yet. <a href="${SOLEX}">Buy your first pair at SoleX</a>.`;
  $('#mkt').innerHTML=MK.map(d=>{const own=me&&d.seller===me.id;return `<div class="card">${pic(d.shoe)}<p>${esc(d.shoe.n)}</p><small>Size ${esc(d.size)} &middot; ${d.price.toLocaleString()} coins</small><small>Seller: ${esc(d.seller_name)}</small><div class="row"><button class="btn ${own?'':'pri'}" data-id="${d.id}" data-a="${own?'x':'b'}">${own?'Cancel listing':'Buy'}</button></div></div>`}).join('');
  $('#mktmsg').textContent=!me?'Sign in to see listings.':MK.length?'':'No listings yet. Sell a shoe from your inventory.';
@@ -153,8 +158,18 @@ $('#mkt').onclick=e=>{const b=e.target.closest('button');if(!b)return;
  b.dataset.a==='x'?rpc('cancel_listing',{p_id:+b.dataset.id},'Back in your inventory'):rpc('buy_listing',{p_id:+b.dataset.id},'Bought! Check your inventory')};
 document.querySelectorAll('.tab[data-v]').forEach(b=>b.onclick=()=>{
  document.querySelectorAll('.tab[data-v]').forEach(t=>t.classList.toggle('on',t===b));
- ['inv','mkt','wk','ms','lb'].forEach(v=>$('#v-'+v).hidden=v!==b.dataset.v);load()});
+ ['inv','mkt','wk','ms','lb','col'].forEach(v=>$('#v-'+v).hidden=v!==b.dataset.v);load()});
+function paintCol(){
+ if(!me){$('#col').innerHTML='<p class="msg">Sign in to see your collections.</p>';return}
+ const own=new Set(INV.map(x=>x.shoe.n));
+ $('#col').innerHTML=SETS.slice().sort((a,b)=>a.name.localeCompare(b.name)).map(s=>{
+  const sh=SHS.filter(x=>x.set_name===s.name).sort((a,b)=>(a.is_grail-b.is_grail)||a.name.localeCompare(b.name)),
+   n=sh.filter(x=>own.has(x.name)).length,done=sh.length>0&&n===sh.length,got=CL.includes(s.name);
+  return `<div class="colset"><div class="colh"><div><h3>${esc(s.name)}</h3><small>${n} / ${sh.length} collected &middot; prize ${s.prize.toLocaleString()} coins</small></div><button class="btn ${done&&!got?'pri':''}" data-set="${esc(s.name)}" ${done&&!got?'':'disabled'}>${got?'Prize claimed':done?'Claim '+s.prize.toLocaleString()+' coins':'Collect all to claim'}</button></div><div class="colg">${sh.map(x=>{const has=own.has(x.name);return `<div class="cs"><div style="${has?'':'opacity:.25;filter:grayscale(1)'}">${shoeSVG(x.colors,x.finish,x.name,x.hi)}</div><small>${esc(x.name.slice(s.name.length+1).replace(/ \(Set .*\)$/,''))}${x.is_grail?(has?' (GRAIL)':x.taken?' (GRAIL - taken)':' (GRAIL - drop only)'):''}</small></div>`}).join('')}</div></div>`}).join('')||'<p class="msg">No collections yet.</p>';
+}
+$('#col').onclick=e=>{const s=e.target.dataset.set;if(s)rpc('claim_collection',{p_set:s},'Collection prize claimed!')};
 function paint2(){
+ paintCol();
  $('#nw').textContent=me&&NW!=null?'Net worth '+Number(NW).toLocaleString():'';
  $('#adm').hidden=!(prof&&prof.is_admin);
  $('#lb').innerHTML=!me?'<p class="msg">Sign in to see the leaderboard.</p>':LB.map((r,k)=>`<div class="lbr${prof&&r.name===prof.name?' me':''}"><b>#${k+1}</b><span>${esc(r.name)}</span><b>${Number(r.networth).toLocaleString()}</b><small>${Number(r.coins).toLocaleString()} coins &middot; ${r.shoes} shoes</small></div>`).join('');
