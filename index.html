@@ -13,7 +13,7 @@ body{font-family:Inter,system-ui,sans-serif;background:var(--ink);color:#fff;min
 header{display:flex;justify-content:space-between;align-items:center;padding:18px 28px;gap:12px;flex-wrap:wrap;max-width:1250px;margin:auto}
 .logo{font-family:Syne,sans-serif;font-weight:800;font-size:26px}.logo b{color:var(--coral)}
 .who{display:flex;gap:12px;align-items:center;font-weight:700}
-#coins{background:var(--ink2);padding:9px 16px;border-radius:99px}
+#coins,#nw{background:var(--ink2);padding:9px 16px;border-radius:99px}#coins:empty,#nw:empty{display:none}
 .btn{padding:11px 20px;border-radius:14px;border:0;font:700 14px Inter;cursor:pointer;background:var(--line);color:#fff}
 .btn.pri{background:var(--coral)}.btn:hover{filter:brightness(1.12)}
 .tabs{display:flex;gap:8px;padding:0 28px 18px;max-width:1250px;margin:auto;flex-wrap:wrap}
@@ -36,6 +36,9 @@ h2{font:800 26px Syne;margin-bottom:8px}
 .am input{width:100%;padding:13px;border-radius:12px;border:1px solid var(--line);background:var(--ink);color:#fff;font:15px Inter;margin:8px 0}
 .two{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px}
 .of{display:flex;justify-content:space-between;align-items:center;gap:10px;background:var(--ink);padding:12px;border-radius:12px;margin-top:8px}
+.mbar{height:10px;background:var(--ink);border-radius:9px;margin:12px 4px 0;overflow:hidden}.mbar i{display:block;height:100%;background:linear-gradient(90deg,var(--coral),#ffb400)}
+.lbr{display:grid;grid-template-columns:50px 1fr 130px 210px;gap:10px;align-items:center;background:var(--ink2);padding:13px 16px;border-radius:14px;margin-bottom:8px}.lbr.me{outline:2px solid var(--coral)}.lbr small{color:var(--mut)}
+@media(max-width:700px){.lbr{grid-template-columns:40px 1fr 100px}.lbr small{display:none}}
 :focus-visible{outline:3px solid #ffb400;outline-offset:2px}
 #toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(90px);background:#fff;color:var(--ink);padding:12px 20px;border-radius:14px;font-weight:600;transition:transform .3s;z-index:20;max-width:90vw}
 #toast.show{transform:translateX(-50%)}
@@ -45,18 +48,23 @@ h2{font:800 26px Syne;margin-bottom:8px}
 <body>
 <header>
   <div class="logo">Sole<b>Smith</b></div>
-  <div class="who"><span id="coins"></span><button class="btn pri" id="auth">Sign in</button></div>
+  <div class="who"><span id="nw"></span><span id="coins"></span><button class="btn" id="nm">Change name</button><button class="btn pri" id="auth">Sign in</button></div>
 </header>
 <div class="tabs">
   <button class="tab on" data-v="inv">My inventory</button>
   <button class="tab" data-v="mkt">Player market</button>
   <button class="tab" data-v="wk">Workers</button>
+  <button class="tab" data-v="ms">Missions</button>
+  <button class="tab" data-v="lb">Leaderboard</button>
   <a class="tab" href="https://mohamednaser2143-sudo.github.io/solex/">Shop at SoleX</a>
+  <a class="tab" id="adm" href="admin.html" hidden>Admin</a>
 </div>
 <section class="view" id="v-inv"><h2>My inventory</h2><p class="msg" id="invmsg"></p><div class="cards" id="inv"></div></section>
 <section class="view" id="v-mkt" hidden><h2>Player market</h2><p class="msg" id="mktmsg"></p><div class="cards" id="mkt"></div></section>
 
 <section class="view" id="v-wk" hidden><h2>Workers</h2><p class="msg">Hire up to 5 workers. The more expensive the worker, the more they pay: 30, 45, 60, 80 and 100 coins every 2 minutes.</p><div id="wk"></div></section>
+<section class="view" id="v-ms" hidden><h2>Daily missions</h2><p class="msg">Finish missions to earn coins. They reset every day (UTC).</p><div class="cards" id="ms"></div></section>
+<section class="view" id="v-lb" hidden><h2>Leaderboard</h2><p class="msg">Ranked by net worth: your coins plus the value of every shoe you own.</p><div id="lb"></div></section>
 <div class="ov" id="om"><div class="am"><h2>Offers</h2><p class="msg">Pick an offer. Offers expire in 3 minutes.</p><div id="ol"></div></div></div>
 <div class="ov" id="am"><div class="am">
   <h2>Welcome</h2><p class="msg">Create an account and start with 1,000 coins.</p>
@@ -90,18 +98,20 @@ function shoeSVG(c,f){
  <path d="M150 96 L165 60 L200 58 L215 92 Q182 102 150 96 Z" fill="#000" opacity=".12"/>
  </g>${laces}${fx}</svg>`;
 }
-let me=null,prof=null,INV=[],MK=[];
+let me=null,prof=null,INV=[],MK=[],NW=null,LB=[],MS=[];
 async function load(){
  if(!me){prof=null;INV=[];MK=[];return paint()}
  await SB.rpc('collect');
- const [p,i,m]=await Promise.all([
+ const [p,i,m,nw,lb,ms]=await Promise.all([
   SB.from('profiles').select('*').eq('id',me.id).single(),
   SB.from('inventory').select('*').order('id',{ascending:false}),
-  SB.from('listings').select('*').order('id',{ascending:false})]);
- prof=p.data;INV=i.data||[];MK=m.data||[];paint();
+  SB.from('listings').select('*').order('id',{ascending:false}),
+  SB.rpc('my_networth'),SB.rpc('leaderboard'),SB.rpc('get_missions')]);
+ prof=p.data;INV=i.data||[];MK=m.data||[];NW=nw.data;LB=lb.data||[];MS=ms.data||[];paint();
 }
 function pic(s){return `<div class="pic"><span style="background:${RC[s.r]||RC.Common}">${esc(s.r)}</span>${shoeSVG(s.c,s.f)}</div>`}
 function paint(){
+ paint2();
  $('#auth').textContent=me?'Sign out':'Sign in';
  $('#coins').textContent=me&&prof?prof.coins.toLocaleString()+' coins':'';
  $('#inv').innerHTML=INV.map(d=>`<div class="card">${pic(d.shoe)}<p>${esc(d.shoe.n)}</p><small>Size ${esc(d.size)}${d.paid?' &middot; paid '+d.paid:''}${d.shoe.v?' &middot; worth '+d.shoe.v.toLocaleString():''}</small><div class="row"><button class="btn pri" data-offer="${d.id}">Get offers</button><button class="btn" style="margin-top:8px" data-sell="${d.id}">List for players</button></div></div>`).join('');
@@ -134,7 +144,16 @@ $('#mkt').onclick=e=>{const b=e.target.closest('button');if(!b)return;
  b.dataset.a==='x'?rpc('cancel_listing',{p_id:+b.dataset.id},'Back in your inventory'):rpc('buy_listing',{p_id:+b.dataset.id},'Bought! Check your inventory')};
 document.querySelectorAll('.tab[data-v]').forEach(b=>b.onclick=()=>{
  document.querySelectorAll('.tab[data-v]').forEach(t=>t.classList.toggle('on',t===b));
- ['inv','mkt','wk'].forEach(v=>$('#v-'+v).hidden=v!==b.dataset.v);load()});
+ ['inv','mkt','wk','ms','lb'].forEach(v=>$('#v-'+v).hidden=v!==b.dataset.v);load()});
+function paint2(){
+ $('#nw').textContent=me&&NW!=null?'Net worth '+Number(NW).toLocaleString():'';
+ $('#adm').hidden=!(prof&&prof.is_admin);
+ $('#lb').innerHTML=!me?'<p class="msg">Sign in to see the leaderboard.</p>':LB.map((r,k)=>`<div class="lbr${prof&&r.name===prof.name?' me':''}"><b>#${k+1}</b><span>${esc(r.name)}</span><b>${Number(r.networth).toLocaleString()}</b><small>${Number(r.coins).toLocaleString()} coins &middot; ${r.shoes} shoes</small></div>`).join('');
+ $('#ms').innerHTML=!me?'<p class="msg">Sign in to see missions.</p>':MS.map(m=>{const done=m.progress>=m.target,can=done&&!m.claimed,pc=Math.min(100,Math.round(m.progress/m.target*100));
+  return `<div class="card"><p>${esc(m.title)}</p><small>${Math.min(m.progress,m.target)} / ${m.target} &middot; reward ${m.reward} coins</small><div class="mbar"><i style="width:${pc}%"></i></div><div class="row"><button class="btn ${can?'pri':''}" data-claim="${m.mid}" ${can?'':'disabled'}>${m.claimed?'Claimed today':done?'Claim '+m.reward+' coins':'Not finished yet'}</button></div></div>`}).join('');
+}
+$('#ms').onclick=e=>{const id=e.target.dataset.claim;if(id)rpc('claim_mission',{p_id:+id},'Mission reward claimed!')};
+$('#nm').onclick=()=>{if(!me)return $('#am').classList.add('on');const n=prompt('Pick a name (3-16 letters, numbers or _)',prof?prof.name:'');if(n)rpc('set_name',{p_name:n},'Name changed')};
 async function login(up){
  const email=$('#em').value.trim(),password=$('#pw').value;
  const r=up?await SB.auth.signUp({email,password}):await SB.auth.signInWithPassword({email,password});
