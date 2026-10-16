@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>SoleSmith Admin</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
+<style>
+*{box-sizing:border-box;margin:0}
+body{font-family:system-ui,sans-serif;background:#1b1626;color:#fff;padding:24px;max-width:1100px;margin:auto}
+h1{font-size:28px;margin-bottom:4px}h2{font-size:18px;margin:26px 0 10px}
+p{color:#a79fba;margin-bottom:12px}
+input{padding:11px;border-radius:10px;border:1px solid #3a3150;background:#2a2338;color:#fff;font-size:15px;margin:4px 6px 4px 0}
+button{padding:10px 16px;border:0;border-radius:10px;background:#ff5a36;color:#fff;font-weight:700;cursor:pointer}
+button.g{background:#3a3150}
+.box{background:#2a2338;border-radius:16px;padding:18px}
+table{width:100%;border-collapse:collapse;font-size:14px}
+th,td{text-align:left;padding:10px 8px;border-bottom:1px solid #3a3150}
+th{color:#a79fba}
+td button{padding:7px 12px;margin-right:6px}
+#msg{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#fff;color:#1b1626;padding:12px 20px;border-radius:12px;font-weight:700;display:none}
+.wrap{overflow-x:auto}
+</style>
+</head>
+<body>
+<h1>SoleSmith Admin</h1>
+<p>Only accounts marked as admin in Supabase can use this page.</p>
+<div id="login" class="box" hidden>
+  <input id="em" type="email" placeholder="Email"><input id="pw" type="password" placeholder="Password">
+  <button id="go">Sign in</button>
+</div>
+<p id="note"></p>
+<div id="panel" hidden>
+  <h2>Drop</h2>
+  <div class="box">
+    <p>Replace the current drop with a new one. Leave the boxes empty for a random drop.</p>
+    <input id="dv" type="number" placeholder="Worth (coins)"><input id="ds" type="number" placeholder="How many available">
+    <button id="rr">New drop now</button>
+  </div>
+  <h2>Players</h2>
+  <div class="box wrap"><table><thead><tr><th>Name</th><th>Email</th><th>Coins</th><th>Workers</th><th>Net worth</th><th></th></tr></thead><tbody id="rows"></tbody></table></div>
+  <p style="margin-top:12px"><button class="g" id="rf">Refresh</button> <button class="g" id="out">Sign out</button></p>
+</div>
+<div id="msg"></div>
+<script>
+const $=s=>document.querySelector(s);
+const SB=supabase.createClient("https://xqftxszpozrpuzhsnyho.supabase.co","sb_publishable_IBatpScfMC8L4Ys93DQWMg_GJKLyD3B");
+const esc=t=>String(t==null?'':t).replace(/[<>&"]/g,'');
+function say(t){const m=$('#msg');m.textContent=t;m.style.display='block';setTimeout(()=>m.style.display='none',2800)}
+let P=[];
+async function init(){
+ const {data:{session}}=await SB.auth.getSession();
+ $('#login').hidden=!!session;$('#panel').hidden=true;
+ if(!session){$('#note').textContent='Sign in with your admin account.';return}
+ const {data:ok}=await SB.rpc('is_admin');
+ if(!ok){$('#note').textContent='This account is not an admin.';return}
+ $('#note').textContent='';$('#panel').hidden=false;load();
+}
+async function load(){
+ const {data,error}=await SB.rpc('admin_players');
+ if(error)return say(error.message);
+ P=data;
+ $('#rows').innerHTML=P.map((r,i)=>`<tr><td>${esc(r.pname)}</td><td>${esc(r.email)}</td><td>${Number(r.coins).toLocaleString()}</td><td>${r.workers}</td><td>${Number(r.networth).toLocaleString()}</td><td><button data-g="${i}">Give / take coins</button><button class="g" data-r="${i}">Reset</button></td></tr>`).join('');
+}
+$('#rows').onclick=async e=>{
+ const g=e.target.dataset.g,r=e.target.dataset.r;
+ if(g!==undefined){const n=Math.round(+prompt('How many coins? (use a minus to take away)','1000'));if(!n)return;
+  const {error}=await SB.rpc('admin_give',{p_uid:P[g].uid,p_amount:n});say(error?error.message:'Done');load()}
+ if(r!==undefined){if(!confirm('Reset '+P[r].pname+'? Coins go back to 1,000 and shoes and workers are removed.'))return;
+  const {error}=await SB.rpc('admin_reset',{p_uid:P[r].uid});say(error?error.message:'Player reset');load()}
+};
+$('#rr').onclick=async()=>{
+ const v=$('#dv').value,s=$('#ds').value;
+ const {error}=await SB.rpc('admin_reroll_drop',{p_value:v?+v:null,p_stock:s?+s:null});say(error?error.message:'New drop is live')};
+$('#go').onclick=async()=>{const {error}=await SB.auth.signInWithPassword({email:$('#em').value.trim(),password:$('#pw').value});if(error)return say(error.message);init()};
+$('#rf').onclick=load;$('#out').onclick=async()=>{await SB.auth.signOut();init()};
+init();
+</script>
+</body>
+</html>
