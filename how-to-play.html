@@ -4,163 +4,439 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>How to Play - SoleSmith and SoleX</title>
-<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+<script>try{document.documentElement.dataset.theme=localStorage.getItem('theme')||'dark'}catch(e){}</script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
 <style>
-:root{--ink:#1b1626;--ink2:#2a2338;--coral:#ff5a36;--line:#3a3150;--mut:#a79fba}
+:root{--bg:#1b1626;--card:#2a2338;--fg:#fff;--mut:#a79fba;--coral:#ff5a36;--gold:#ffb400;--line:#3a3150}
+:root[data-theme="light"]{--bg:#f3f0ea;--card:#ffffff;--fg:#1b1626;--mut:#6b6480;--line:#d9d3e3}
 *{box-sizing:border-box;margin:0}
-body{-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility;font-family:Inter,system-ui,sans-serif;background:var(--ink);color:#fff;line-height:1.6}
-.w{max-width:820px;margin:auto;padding:24px 20px 70px}
-.logo{font:800 26px Syne,sans-serif}.logo b{color:var(--coral)}
-h1{font:800 clamp(34px,6vw,52px) Inter,system-ui,sans-serif;margin:18px 0 8px;letter-spacing:-.03em}
-.lead{color:var(--mut);font-size:18px;margin-bottom:22px}
-.go{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:26px}
-.btn{padding:12px 22px;border-radius:14px;background:var(--line);color:#fff;font-weight:700;text-decoration:none}
-.btn.pri{background:var(--coral)}
-.toc{background:var(--ink2);border-radius:16px;padding:16px 20px;margin-bottom:26px;display:flex;gap:8px 18px;flex-wrap:wrap}
-.toc a{color:var(--coral);text-decoration:none;font-weight:600}
-section{background:var(--ink2);border-radius:20px;padding:22px 24px;margin-bottom:16px}
-h2{font:800 24px Inter,system-ui,sans-serif;letter-spacing:-.02em;margin-bottom:10px}
-p{margin-bottom:10px}
-ul{padding-left:22px;margin-bottom:6px}li{margin-bottom:6px}
-.tip{background:var(--ink);border-left:4px solid var(--coral);border-radius:10px;padding:10px 14px;margin-top:10px;color:#e8e3f3}
-table{width:100%;border-collapse:collapse;margin:8px 0;font-size:15px}
-th,td{text-align:left;padding:8px;border-bottom:1px solid var(--line)}th{color:var(--mut)}
-b.c{color:#ffb400}
-:focus-visible{outline:3px solid #ffb400;outline-offset:2px}
+body{font-family:Inter,system-ui,sans-serif;background:var(--bg);color:var(--fg);-webkit-font-smoothing:antialiased;min-height:100vh}
+.app{max-width:560px;margin:auto;min-height:100vh;display:flex;flex-direction:column;padding:14px 16px 18px}
+.top{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:10px}
+.logo{font-weight:800;font-size:20px;letter-spacing:-.02em}.logo b{color:var(--coral)}
+.mini{background:var(--card);color:var(--fg);border:1px solid var(--line);border-radius:99px;padding:7px 14px;font:700 13px Inter;cursor:pointer;text-decoration:none}
+.bars{display:flex;gap:4px;margin-bottom:12px}
+.bars button{flex:1;height:6px;border:0;border-radius:9px;background:var(--line);padding:0;cursor:pointer;overflow:hidden}
+.bars i{display:block;height:100%;width:0;background:var(--coral);border-radius:9px}
+.bars .done i{width:100%}
+.stage{flex:1;position:relative;display:flex;align-items:center;cursor:pointer;-webkit-tap-highlight-color:transparent}
+.scene{display:none;flex-direction:column;align-items:center;gap:6px;width:100%;text-align:center}
+.scene.on{display:flex}
+.step{color:var(--coral);font-weight:800;font-size:13px;letter-spacing:.08em;text-transform:uppercase}
+h2{font-size:clamp(26px,7vw,34px);font-weight:800;letter-spacing:-.03em;line-height:1.1}
+svg{width:100%;max-width:440px;height:auto;display:block;margin:4px 0}
+svg *{transform-box:fill-box;transform-origin:center}
+svg.defs{position:absolute;width:0!important;height:0!important;max-width:0!important;margin:0!important;pointer-events:none;overflow:hidden}
+.cap{font-size:clamp(17px,4.6vw,20px);font-weight:600;line-height:1.35;max-width:440px}
+.cap small{display:block;color:var(--mut);font-weight:600;font-size:14px;margin-top:6px}
+.ctl{display:flex;gap:10px;justify-content:center;margin-top:12px}
+.ctl button{background:var(--card);color:var(--fg);border:1px solid var(--line);border-radius:14px;padding:12px 20px;font:700 15px Inter;cursor:pointer;min-width:96px}
+.ctl .pri{background:var(--coral);border-color:var(--coral);color:#fff}
+.end{display:flex;flex-direction:column;gap:10px;width:100%;max-width:340px;margin-top:8px}
+.end a,.end button{background:var(--card);color:var(--fg);border:1px solid var(--line);border-radius:14px;padding:14px;font:800 16px Inter;text-decoration:none;cursor:pointer}
+.end .pri{background:var(--coral);border-color:var(--coral);color:#fff}
+:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
+.where{display:inline-block;background:var(--card);border:1px solid var(--line);border-radius:99px;padding:6px 14px;font-weight:700;font-size:13px;margin:2px 0}
+.where b{font-weight:800}.where.sx b{color:#00a85a}.where.ss b{color:var(--coral)}
+.grow{animation:grow 1s ease-out both;animation-delay:var(--dl,0s);transform-origin:0 50%!important}
+@keyframes grow{from{transform:scaleX(0)}}
+.paused .scene *{animation-play-state:paused!important}
+/* animations */
+.pop{animation:pop .55s cubic-bezier(.2,1.6,.4,1) both;animation-delay:var(--dl,0s)}
+@keyframes pop{from{transform:scale(0);opacity:0}to{transform:scale(1);opacity:1}}
+.fade{animation:fade .5s both;animation-delay:var(--dl,0s)}
+@keyframes fade{from{opacity:0}to{opacity:1}}
+.hide{animation:hide .3s both;animation-delay:var(--dl,0s)}
+@keyframes hide{to{opacity:0}}
+.dropin{animation:dropin .7s cubic-bezier(.3,1.4,.5,1) both;animation-delay:var(--dl,0s)}
+@keyframes dropin{from{transform:translateY(-230px);opacity:0}to{transform:none;opacity:1}}
+.draw{stroke-dasharray:1;stroke-dashoffset:1;animation:draw 3s ease-out .3s forwards}
+@keyframes draw{to{stroke-dashoffset:0}}
+.press{animation:press .45s both;animation-delay:var(--dl,0s)}
+@keyframes press{40%{transform:scale(.88)}100%{transform:scale(1)}}
+.fly{animation:fly 1.1s ease-in-out both;animation-delay:var(--dl,0s)}
+@keyframes fly{0%{opacity:1;transform:none}80%{opacity:1}100%{opacity:0;transform:translate(var(--tx),var(--ty)) scale(.5)}}
+.pulse{animation:pulse 1s ease-in-out infinite}
+@keyframes pulse{50%{transform:scale(1.1)}}
+.rise{animation:rise 2.4s ease-out infinite;animation-delay:var(--dl,0s)}
+@keyframes rise{0%{opacity:0;transform:translateY(8px)}20%{opacity:1}100%{opacity:0;transform:translateY(-46px)}}
+.ring{stroke-dasharray:402;animation:ring 3s linear forwards}
+@keyframes ring{from{stroke-dashoffset:0}to{stroke-dashoffset:402}}
+.slide{animation:slide .9s ease-in-out both;animation-delay:var(--dl,0s)}
+@keyframes slide{to{transform:translateY(var(--ty,0))}}
+.lid{animation:lid .8s ease-out both;animation-delay:var(--dl,0s)}
+@keyframes lid{to{transform:translateY(-34px) rotate(-18deg)}}
+.tick{stroke-dasharray:1;stroke-dashoffset:1;animation:draw .4s ease-out both;animation-delay:var(--dl,0s)}
+.spin{animation:spin 6s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+@media (prefers-reduced-motion:reduce){*{animation-duration:.01s!important;animation-delay:0s!important}}
 </style>
 </head>
 <body>
-<div class="w">
-<div class="logo">Sole<b>Smith</b> &amp; Sole<b>X</b></div>
-<h1>How to play</h1>
-<p class="lead">Collect sneakers, trade with other players, and get rich. Here is everything in simple words.</p>
-<div class="go">
-  <a class="btn" href="how-to-play.html">Watch the 1-minute animation</a>
-  <a class="btn pri" href="https://mohamednaser2143-sudo.github.io/solex/">Go to SoleX (the shop)</a>
-  <a class="btn" href="https://mohamednaser2143-sudo.github.io/solesmith/">Go to SoleSmith (my game)</a>
+<div class="app" id="app">
+  <div class="top"><div class="logo">Sole<b>Smith</b> &amp; Sole<b>X</b></div>
+  <div><a class="mini" href="how-to-play-full.html">Read the full guide</a> <button class="mini" id="th">Light mode</button></div></div>
+  <div class="bars" id="bars" role="tablist" aria-label="Steps"></div>
+
+  <div class="stage" id="stage">
+  <svg class="defs" width="0" height="0" aria-hidden="true"><defs>
+    <symbol id="coin" viewBox="0 0 40 40"><circle cx="20" cy="20" r="18" fill="#ffb400" stroke="#c98a00" stroke-width="3"/><text x="20" y="27" text-anchor="middle" font-size="20" font-weight="800" fill="#8a5a00">$</text></symbol>
+    <symbol id="shoe" viewBox="0 0 420 220"><g stroke="rgba(0,0,0,.35)" stroke-width="2" stroke-linejoin="round">
+      <path d="M30 172 H386 Q384 192 355 192 H60 Q34 192 30 172 Z" style="fill:var(--e,#0b0b0f)"/>
+      <path d="M28 148 H388 V166 Q388 180 360 180 H58 Q28 180 28 162 Z" style="fill:var(--d,#ffffff)"/>
+      <path d="M40 148 L38 66 Q40 50 62 50 L100 52 Q118 92 150 96 L165 60 L200 58 L215 92 Q330 98 372 132 Q390 146 388 150 Z" style="fill:var(--a,#e63946)"/>
+      <path d="M296 98 Q360 106 372 132 Q390 146 388 150 L300 150 Q316 124 296 98 Z" style="fill:var(--b,#ffffff)"/>
+      <path d="M38 148 L38 66 Q40 50 62 50 L82 51 Q96 100 86 148 Z" style="fill:var(--b,#ffffff)"/>
+      <path d="M96 138 C150 152 245 134 305 104 C252 124 200 118 150 108 C124 103 104 114 96 138 Z" style="fill:var(--c,#ffd23f)"/>
+    </g></symbol>
+  <symbol id="shoeh" viewBox="0 0 420 220"><g stroke="rgba(0,0,0,.35)" stroke-width="2" stroke-linejoin="round">
+      <path d="M30 172 H386 Q384 192 355 192 H60 Q34 192 30 172 Z" style="fill:var(--e,#0b0b0f)"/>
+      <path d="M28 148 H388 V166 Q388 180 360 180 H58 Q28 180 28 162 Z" style="fill:var(--d,#ffffff)"/>
+      <path d="M40 148 L36 38 Q38 12 66 12 L116 14 Q136 22 146 54 L162 16 L204 12 L222 94 Q330 100 372 132 Q390 146 388 150 Z" style="fill:var(--a,#e63946)"/>
+      <path d="M296 98 Q360 106 372 132 Q390 146 388 150 L300 150 Q316 124 296 98 Z" style="fill:var(--b,#ffffff)"/>
+      <path d="M38 148 L36 38 Q38 12 66 12 L88 13 Q100 90 88 148 Z" style="fill:var(--b,#ffffff)"/>
+      <path d="M96 138 C150 152 245 134 305 104 C252 124 200 118 150 108 C124 103 104 114 96 138 Z" style="fill:var(--c,#ffd23f)"/>
+    </g></symbol>
+  </defs></svg>
+
+  <!-- 0 -->
+  <section class="scene" data-n="0"><div class="step"></div><h2>How it works</h2>
+    <svg viewBox="0 0 420 250" role="img" aria-label="SoleX is the shop, SoleSmith is your game">
+      <g class="pop" style="--dl:.2s">
+        <rect x="8" y="20" width="190" height="186" rx="14" fill="var(--card)" stroke="#00a85a" stroke-width="3"/>
+        <rect x="8" y="20" width="190" height="30" rx="14" fill="#00a85a"/><text x="103" y="40" text-anchor="middle" font-size="14" font-weight="800" fill="#ffffff">SoleX</text>
+        <rect x="22" y="62" width="162" height="70" rx="10" fill="#efece6"/><use href="#shoe" x="40" y="64" width="126" height="66" style="--a:#14141c;--b:#2e86ff;--c:#ffffff;--d:#ffffff;--e:#2e86ff"/>
+        <rect x="40" y="144" width="126" height="28" rx="10" fill="#00a85a"/><text x="103" y="163" text-anchor="middle" font-size="13" font-weight="800" fill="#ffffff">Buy now</text>
+        <text x="103" y="194" text-anchor="middle" font-size="13" font-weight="800" fill="var(--fg)">The SHOP</text>
+      </g>
+      <g class="pop" style="--dl:.7s">
+        <rect x="222" y="20" width="190" height="186" rx="14" fill="var(--card)" stroke="#ff5a36" stroke-width="3"/>
+        <rect x="222" y="20" width="190" height="30" rx="14" fill="#ff5a36"/><text x="317" y="40" text-anchor="middle" font-size="14" font-weight="800" fill="#ffffff">SoleSmith</text>
+        <rect x="236" y="62" width="162" height="70" rx="10" fill="none" stroke="var(--mut)" stroke-width="2" stroke-dasharray="6 6"/>
+        <text x="317" y="152" text-anchor="middle" font-size="12" font-weight="700" fill="var(--mut)">Sell . Trade . Workers . Missions</text>
+        <text x="317" y="194" text-anchor="middle" font-size="13" font-weight="800" fill="var(--fg)">YOUR GAME</text>
+      </g>
+      <g class="fly" style="--dl:1.8s;--tx:214px;--ty:0px"><use href="#shoe" x="50" y="68" width="106" height="56" style="--a:#14141c;--b:#2e86ff;--c:#ffffff;--d:#ffffff;--e:#2e86ff"/></g>
+      <g class="pop" style="--dl:3s"><use href="#shoe" x="262" y="66" width="110" height="58" style="--a:#14141c;--b:#2e86ff;--c:#ffffff;--d:#ffffff;--e:#2e86ff"/></g>
+      <g class="pop" style="--dl:3.6s"><rect x="92" y="216" width="236" height="28" rx="14" fill="#ffb400"/><text x="210" y="235" text-anchor="middle" font-size="13" font-weight="800" fill="#1b1626">One account works on both</text></g>
+    </svg>
+    <p class="cap">There are two websites.<small>SoleX is the shop where you buy. SoleSmith is your game, where your shoes live and you sell, trade and earn.</small></p></section>
+
+  <!-- 1 -->
+  <section class="scene" data-n="1"><div class="step"></div><h2>Make an account</h2><div class="where sx">On <b>SoleX</b> or <b>SoleSmith</b>: press Sign in</div>
+    <svg viewBox="0 0 420 250" role="img" aria-label="Creating an account and getting 1,000 coins">
+      <rect x="10" y="14" width="236" height="222" rx="20" fill="var(--card)"/>
+      <text x="28" y="44" font-size="16" font-weight="800" fill="var(--fg)">Welcome</text>
+      <rect x="28" y="58" width="200" height="34" rx="10" fill="var(--bg)" stroke="var(--line)" stroke-width="2"/><text x="40" y="80" font-size="13" font-weight="600" fill="var(--mut)">you@email.com</text>
+      <rect x="28" y="102" width="200" height="34" rx="10" fill="var(--bg)" stroke="var(--line)" stroke-width="2"/><text x="40" y="124" font-size="13" font-weight="600" fill="var(--mut)">* * * * * *</text>
+      <g class="press" style="--dl:1.6s"><rect x="28" y="150" width="200" height="38" rx="12" fill="#ff5a36"/><text x="128" y="175" text-anchor="middle" font-size="15" font-weight="800" fill="#ffffff">Create account</text></g>
+      <text x="128" y="214" text-anchor="middle" font-size="12" font-weight="700" fill="var(--mut)">Same login on both websites</text>
+      <text id="cnt" data-count="1000" data-delay="2200" class="fade" style="--dl:2.1s" x="334" y="116" text-anchor="middle" font-size="54" font-weight="800" fill="#ffb400">0</text>
+      <text class="fade" style="--dl:2.1s" x="334" y="144" text-anchor="middle" font-size="18" font-weight="700" fill="var(--mut)">coins to start</text>
+      <use class="dropin" style="--dl:2.3s" href="#coin" x="290" y="166" width="40" height="40"/><use class="dropin" style="--dl:2.5s" href="#coin" x="334" y="172" width="40" height="40"/><use class="dropin" style="--dl:2.7s" href="#coin" x="312" y="150" width="40" height="40"/>
+    </svg>
+    <p class="cap">Make one account. Use the same email and password on both websites.<small>You start with 1,000 coins.</small></p></section>
+
+  <!-- 2 -->
+  <section class="scene" data-n="2"><div class="step"></div><h2>Buy shoes</h2><div class="where sx">Go to <b>SoleX</b></div>
+    <svg viewBox="0 0 420 250" role="img" aria-label="Buying a shoe">
+      <rect x="10" y="10" width="220" height="230" rx="18" fill="var(--card)"/>
+      <rect x="22" y="22" width="196" height="100" rx="12" fill="#efece6"/>
+      <use href="#shoe" x="40" y="30" width="160" height="84" style="--a:#14141c;--b:#2e86ff;--c:#ffffff;--d:#ffffff;--e:#2e86ff"/>
+      <text x="26" y="146" font-size="14" font-weight="700" fill="var(--fg)">Low Midnight Runner</text>
+      <g font-size="12" font-weight="700" text-anchor="middle">
+        <rect x="26" y="156" width="34" height="26" rx="8" fill="var(--line)"/><text x="43" y="173" fill="var(--fg)">8</text>
+        <rect class="pulse" x="66" y="156" width="34" height="26" rx="8" fill="#ff5a36"/><text x="83" y="173" fill="#ffffff">9</text>
+        <rect x="106" y="156" width="34" height="26" rx="8" fill="var(--line)"/><text x="123" y="173" fill="var(--fg)">10</text>
+        <rect x="150" y="156" width="64" height="26" rx="8" fill="var(--line)"/><text x="182" y="173" fill="var(--fg)">Amount 2</text>
+      </g>
+      <g class="press" style="--dl:2.2s"><rect x="26" y="194" width="188" height="36" rx="12" fill="#00a85a"/><text x="120" y="217" text-anchor="middle" font-size="15" font-weight="800" fill="#ffffff">Buy now</text></g>
+      <g class="fly" style="--dl:2.5s;--tx:200px;--ty:-30px"><use href="#shoe" x="50" y="34" width="110" height="58" style="--a:#14141c;--b:#2e86ff;--c:#ffffff;--d:#ffffff;--e:#2e86ff"/></g>
+      <rect x="262" y="40" width="148" height="170" rx="18" fill="none" stroke="var(--mut)" stroke-width="2" stroke-dasharray="6 6"/>
+      <text x="336" y="68" text-anchor="middle" font-size="14" font-weight="700" fill="var(--mut)">My inventory</text>
+      <g class="pop" style="--dl:3.5s"><use href="#shoe" x="276" y="90" width="120" height="63" style="--a:#14141c;--b:#2e86ff;--c:#ffffff;--d:#ffffff;--e:#2e86ff"/><text x="336" y="188" text-anchor="middle" font-size="24" font-weight="800" fill="#ffb400">x 2</text></g>
+    </svg>
+    <p class="cap">Open SoleX. Click a shoe, pick a size, type how many, and press Buy now.<small>Your shoes go to your inventory in SoleSmith.</small></p></section>
+
+  <!-- 2b -->
+  <section class="scene" data-n="2b"><div class="step"></div><h2>Which shoe?</h2><div class="where sx">In <b>SoleX</b>: use the filter buttons</div>
+    <svg viewBox="0 0 420 250" role="img" aria-label="Low, High and Premium shoes">
+      <g class="pop" style="--dl:.2s"><rect x="10" y="20" width="124" height="196" rx="16" fill="var(--card)"/><rect x="20" y="30" width="104" height="76" rx="10" fill="#efece6"/><use href="#shoe" x="24" y="38" width="96" height="50" style="--a:#14141c;--b:#2e86ff;--c:#ffffff;--d:#ffffff;--e:#2e86ff"/>
+        <text x="72" y="140" text-anchor="middle" font-size="20" font-weight="800" fill="var(--fg)">Low</text><text x="72" y="162" text-anchor="middle" font-size="12" font-weight="700" fill="var(--mut)">normal sneaker</text></g>
+      <g class="pop" style="--dl:.9s"><rect x="148" y="20" width="124" height="196" rx="16" fill="var(--card)"/><rect x="158" y="30" width="104" height="76" rx="10" fill="#efece6"/><use href="#shoeh" x="162" y="34" width="96" height="62" style="--a:#e63946;--b:#ffffff;--c:#ffd23f;--d:#ffffff;--e:#a4161a"/>
+        <text x="210" y="140" text-anchor="middle" font-size="20" font-weight="800" fill="var(--fg)">High</text><text x="210" y="162" text-anchor="middle" font-size="12" font-weight="700" fill="var(--mut)">high-top, costs more</text></g>
+      <g class="pop" style="--dl:1.6s"><rect x="286" y="20" width="124" height="196" rx="16" fill="var(--card)" stroke="#ffb400" stroke-width="4"/><rect x="296" y="30" width="104" height="76" rx="10" fill="#efece6"/><use href="#shoe" x="300" y="38" width="96" height="50" style="--a:#0b0b0f;--b:#d4a017;--c:#d4a017;--d:#ffffff;--e:#d4a017"/>
+        <text x="348" y="140" text-anchor="middle" font-size="20" font-weight="800" fill="#ffb400">Premium</text><text x="348" y="162" text-anchor="middle" font-size="12" font-weight="700" fill="var(--mut)">5,000 to 20,000 coins</text></g>
+      <g class="pop" style="--dl:2.6s"><rect x="40" y="224" width="340" height="22" rx="11" fill="var(--line)"/><text x="210" y="239" text-anchor="middle" font-size="12" font-weight="800" fill="var(--fg)">Collection sets show (Set name) at the end of the name</text></g>
+    </svg>
+    <p class="cap">Low shoes are normal. High shoes are high-tops. Premium shoes cost the most.<small>Premium prices move the most every 3 minutes.</small></p></section>
+
+  <!-- 3 -->
+  <section class="scene" data-n="3"><div class="step"></div><h2>Prices move</h2><div class="where sx">In <b>SoleX</b>: open any shoe to see its chart</div>
+    <svg viewBox="0 0 420 250" role="img" aria-label="A price chart going up">
+      <rect x="10" y="10" width="400" height="230" rx="22" fill="var(--card)"/>
+      <line x1="30" y1="190" x2="390" y2="190" stroke="var(--line)" stroke-width="2"/>
+      <path class="draw" pathLength="1" d="M40 160 L90 138 L130 150 L180 104 L225 122 L270 78 L320 96 L380 52" fill="none" stroke="#00a85a" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>
+      <circle class="pop" style="--dl:3.2s" cx="380" cy="52" r="10" fill="#00a85a"/>
+      <g class="pop" style="--dl:.3s"><rect x="28" y="28" width="92" height="32" rx="10" fill="var(--line)"/><text x="74" y="50" text-anchor="middle" font-size="17" font-weight="800" fill="var(--fg)">$420</text></g>
+      <g class="pop" style="--dl:3.4s"><rect x="272" y="22" width="126" height="32" rx="10" fill="#00a85a"/><text x="335" y="44" text-anchor="middle" font-size="16" font-weight="800" fill="#ffffff">$455  going up</text></g>
+      <text x="40" y="214" font-size="13" font-weight="700" fill="var(--mut)">now</text>
+      <text x="380" y="214" text-anchor="end" font-size="13" font-weight="700" fill="var(--mut)">3 minutes later</text>
+    </svg>
+    <p class="cap">Prices change every 3 minutes. Buy low, sell high!</p></section>
+
+  <!-- 4 -->
+  <section class="scene" data-n="4"><div class="step"></div><h2>Drops</h2><div class="where sx">At the top of <b>SoleX</b></div>
+    <svg viewBox="0 0 420 250" role="img" aria-label="A countdown and a drop">
+      <circle cx="105" cy="112" r="64" fill="none" stroke="var(--line)" stroke-width="12"/>
+      <circle class="ring" cx="105" cy="112" r="64" fill="none" stroke="#ffb400" stroke-width="12" stroke-linecap="round" transform="rotate(-90 105 112)"/>
+      <text x="105" y="122" text-anchor="middle" font-size="32" font-weight="800" fill="var(--fg)" style="animation:hide .3s 1.5s both">1:00</text>
+      <text x="105" y="122" text-anchor="middle" font-size="32" font-weight="800" fill="var(--fg)" style="animation:fade .3s 1.6s both,hide .3s 3s both">0:30</text>
+      <g class="pop" style="--dl:3.2s"><text x="105" y="124" text-anchor="middle" font-size="34" font-weight="800" fill="#e5383b">DROP!</text></g>
+      <g class="pop" style="--dl:3.2s" stroke="#ffb400" stroke-width="5" stroke-linecap="round"><line x1="105" y1="24" x2="105" y2="8"/><line x1="40" y1="46" x2="28" y2="34"/><line x1="170" y1="46" x2="182" y2="34"/><line x1="26" y1="112" x2="8" y2="112"/><line x1="184" y1="112" x2="202" y2="112"/></g>
+      <g class="pop" style="--dl:.7s"><text x="105" y="214" text-anchor="middle" font-size="15" font-weight="700" fill="var(--mut)">beep! 1 minute before</text></g>
+      <g class="pop" style="--dl:3.6s">
+        <rect x="222" y="30" width="188" height="190" rx="18" fill="var(--card)"/>
+        <rect x="232" y="40" width="168" height="84" rx="12" fill="#efece6"/>
+        <use href="#shoe" x="244" y="44" width="144" height="76" style="--a:#ffd23f;--b:#e63946;--c:#ffffff;--d:#ffffff;--e:#0b0b0f"/>
+        <text x="316" y="152" text-anchor="middle" font-size="22" font-weight="800" fill="#ffb400">200 coins</text>
+        <text x="316" y="176" text-anchor="middle" font-size="14" font-weight="800" fill="#e5383b">Only 1 left!</text>
+        <rect class="pulse" x="252" y="188" width="128" height="26" rx="10" fill="#00a85a"/><text x="316" y="206" text-anchor="middle" font-size="14" font-weight="800" fill="#ffffff">Buy drop</text>
+      </g>
+    </svg>
+    <p class="cap">A drop comes every 10 minutes. Only 200 coins! First to click wins.<small>You get a beep 1 minute before.</small></p></section>
+
+  <!-- 4b -->
+  <section class="scene" data-n="4b"><div class="step"></div><h2>Your shoes</h2><div class="where ss">Go to <b>SoleSmith</b>: My inventory</div>
+    <svg viewBox="0 0 420 250" role="img" aria-label="The inventory page">
+      <rect x="10" y="12" width="400" height="226" rx="16" fill="var(--card)"/>
+      <rect x="10" y="12" width="400" height="30" rx="16" fill="#ff5a36"/><text x="26" y="32" font-size="14" font-weight="800" fill="#ffffff">SoleSmith</text>
+      <g font-size="11" font-weight="800" text-anchor="middle"><rect x="22" y="52" width="96" height="24" rx="12" fill="var(--fg)"/><text x="70" y="68" fill="var(--bg)">My inventory</text>
+        <rect x="124" y="52" width="92" height="24" rx="12" fill="var(--line)"/><text x="170" y="68" fill="var(--fg)">Player market</text>
+        <rect x="222" y="52" width="66" height="24" rx="12" fill="var(--line)"/><text x="255" y="68" fill="var(--fg)">Workers</text>
+        <rect x="294" y="52" width="66" height="24" rx="12" fill="var(--line)"/><text x="327" y="68" fill="var(--fg)">Missions</text></g>
+      <g class="pop" style="--dl:.4s"><rect x="24" y="88" width="116" height="140" rx="12" fill="var(--bg)"/><rect x="32" y="94" width="100" height="50" rx="8" fill="#efece6"/><use href="#shoe" x="40" y="96" width="84" height="44" style="--a:#14141c;--b:#2e86ff;--c:#ffffff;--d:#ffffff;--e:#2e86ff"/>
+        <rect x="32" y="152" width="100" height="26" rx="9" fill="#ff5a36"/><text x="82" y="169" text-anchor="middle" font-size="12" font-weight="800" fill="#ffffff">Get offers</text>
+        <rect x="32" y="184" width="100" height="26" rx="9" fill="var(--line)"/><text x="82" y="201" text-anchor="middle" font-size="12" font-weight="800" fill="var(--fg)">List for players</text></g>
+      <g class="pop" style="--dl:.9s"><rect x="152" y="88" width="116" height="140" rx="12" fill="var(--bg)"/><rect x="160" y="94" width="100" height="50" rx="8" fill="#efece6"/><use href="#shoe" x="168" y="96" width="84" height="44" style="--a:#ffd23f;--b:#e63946;--c:#ffffff;--d:#ffffff;--e:#0b0b0f"/>
+        <rect x="160" y="152" width="100" height="26" rx="9" fill="#ff5a36"/><text x="210" y="169" text-anchor="middle" font-size="12" font-weight="800" fill="#ffffff">Get offers</text>
+        <rect x="160" y="184" width="100" height="26" rx="9" fill="var(--line)"/><text x="210" y="201" text-anchor="middle" font-size="12" font-weight="800" fill="var(--fg)">Add to showcase</text></g>
+      <g class="pop" style="--dl:1.4s"><rect x="280" y="88" width="116" height="140" rx="12" fill="var(--bg)"/><rect x="288" y="94" width="100" height="50" rx="8" fill="#efece6"/><use href="#shoe" x="296" y="96" width="84" height="44" style="--a:#2ecc71;--b:#ffffff;--c:#ffd23f;--d:#ffffff;--e:#0b0b0f"/>
+        <rect x="288" y="152" width="100" height="26" rx="9" fill="#ff5a36"/><text x="338" y="169" text-anchor="middle" font-size="12" font-weight="800" fill="#ffffff">Get offers</text></g>
+      <circle class="pulse" cx="112" cy="165" r="14" fill="none" stroke="var(--gold)" stroke-width="4" style="animation-delay:2s"/>
+    </svg>
+    <p class="cap">Every shoe you buy shows up in My inventory.<small>From there you can sell it, list it, or show it off in your showcase.</small></p></section>
+
+  <!-- 5 -->
+  <section class="scene" data-n="5"><div class="step"></div><h2>Sell to offers</h2><div class="where ss">In <b>SoleSmith</b>: My inventory, then Get offers</div>
+    <svg viewBox="0 0 420 250" role="img" aria-label="Offers from buyers">
+      <use href="#shoe" x="6" y="70" width="150" height="79" style="--a:#14141c;--b:#2e86ff;--c:#ffffff;--d:#ffffff;--e:#2e86ff"/>
+      <g class="pop" style="--dl:.4s"><rect x="170" y="14" width="236" height="52" rx="14" fill="var(--card)"/><text x="188" y="46" font-size="15" font-weight="700" fill="var(--fg)">KickCollector pays 212</text></g>
+      <g class="pop" style="--dl:1s"><rect x="170" y="78" width="236" height="52" rx="14" fill="var(--card)"/><text x="188" y="110" font-size="15" font-weight="700" fill="var(--fg)">ResellKing pays 218</text>
+        <rect class="fade" style="--dl:2.8s" x="170" y="78" width="236" height="52" rx="14" fill="none" stroke="#00a85a" stroke-width="4"/></g>
+      <g class="pop" style="--dl:1.6s"><rect x="170" y="142" width="236" height="52" rx="14" fill="var(--card)"/><text x="188" y="174" font-size="15" font-weight="700" fill="var(--fg)">SoleSeeker pays 215</text></g>
+      <g class="pop" style="--dl:2.8s"><circle cx="388" cy="104" r="15" fill="#00a85a"/><path class="tick" style="--dl:2.9s" d="M381 104 L386 109 L396 98" fill="none" stroke="#ffffff" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/></g>
+      <g class="pop" style="--dl:3.3s"><use href="#coin" x="60" y="170" width="40" height="40"/><text x="112" y="198" font-size="26" font-weight="800" fill="#ffb400">+218</text></g>
+      <g class="pop" style="--dl:4.2s"><rect x="110" y="214" width="200" height="30" rx="15" fill="#ff5a36"/><text x="210" y="234" text-anchor="middle" font-size="14" font-weight="800" fill="#ffffff">Big stack? Sell in bulk!</text></g>
+    </svg>
+    <p class="cap">Press Get offers on a shoe. Buyers make offers. Pick one and it sells.<small>Offers last 3 minutes.</small></p></section>
+
+  <!-- 5b -->
+  <section class="scene" data-n="5b"><div class="step"></div><h2>Sell in bulk</h2><div class="where ss">In <b>SoleSmith</b>: My inventory, then Sell in bulk</div>
+    <svg viewBox="0 0 420 250" role="img" aria-label="Selling 500 pairs at once">
+      <g class="pop" style="--dl:.2s"><rect x="8" y="24" width="126" height="190" rx="14" fill="var(--card)"/><text x="71" y="48" text-anchor="middle" font-size="14" font-weight="800" fill="var(--fg)">1. Pick</text>
+        <rect x="18" y="64" width="106" height="52" rx="10" fill="#ff5a36"/><text x="71" y="86" text-anchor="middle" font-size="11" font-weight="800" fill="#ffffff">Low Midnight</text><text x="71" y="104" text-anchor="middle" font-size="14" font-weight="800" fill="#ffffff">x500</text>
+        <rect x="18" y="126" width="106" height="36" rx="10" fill="var(--line)"/><rect x="18" y="170" width="106" height="36" rx="10" fill="var(--line)"/></g>
+      <path class="fade" style="--dl:1s" d="M138 118 L150 118 M144 112 L150 118 L144 124" fill="none" stroke="var(--mut)" stroke-width="3" stroke-linecap="round"/>
+      <g class="pop" style="--dl:1.2s"><rect x="147" y="24" width="126" height="190" rx="14" fill="var(--card)"/><text x="210" y="48" text-anchor="middle" font-size="14" font-weight="800" fill="var(--fg)">2. How many?</text>
+        <rect x="160" y="68" width="100" height="40" rx="10" fill="var(--bg)" stroke="var(--line)" stroke-width="2"/><text x="210" y="95" text-anchor="middle" font-size="20" font-weight="800" fill="var(--fg)">500</text>
+        <g class="press" style="--dl:2.2s"><rect x="160" y="124" width="100" height="36" rx="10" fill="var(--line)"/><text x="210" y="147" text-anchor="middle" font-size="14" font-weight="800" fill="var(--fg)">All</text></g>
+        <rect x="160" y="168" width="100" height="36" rx="10" fill="#ff5a36"/><text x="210" y="191" text-anchor="middle" font-size="13" font-weight="800" fill="#ffffff">Get offers</text></g>
+      <path class="fade" style="--dl:2.4s" d="M277 118 L289 118 M283 112 L289 118 L283 124" fill="none" stroke="var(--mut)" stroke-width="3" stroke-linecap="round"/>
+      <g class="pop" style="--dl:2.6s"><rect x="286" y="24" width="126" height="190" rx="14" fill="var(--card)" stroke="#00a85a" stroke-width="3"/><text x="349" y="48" text-anchor="middle" font-size="14" font-weight="800" fill="var(--fg)">3. Offer</text>
+        <text x="349" y="86" text-anchor="middle" font-size="13" font-weight="700" fill="var(--mut)">200 for each pair</text>
+        <text x="349" y="126" text-anchor="middle" font-size="26" font-weight="800" fill="#ffb400">100,000</text><text x="349" y="146" text-anchor="middle" font-size="13" font-weight="700" fill="var(--mut)">coins</text>
+        <rect x="298" y="164" width="102" height="36" rx="10" fill="#00a85a"/><text x="349" y="187" text-anchor="middle" font-size="14" font-weight="800" fill="#ffffff">Accept</text></g>
+      <g class="rise" style="--dl:3.6s"><use href="#coin" x="330" y="200" width="30" height="30"/></g>
+    </svg>
+    <p class="cap">Got a big stack? Pick the shoe, type how many (or press All), and get offers.<small>Every pair sells at the same price. Grail shoes cannot be sold to offers.</small></p></section>
+
+  <!-- 5c -->
+  <section class="scene" data-n="5c"><div class="step"></div><h2>The fee</h2><div class="where ss">In <b>SoleSmith</b>: Government tab shows today's fee</div>
+    <svg viewBox="0 0 420 250" role="img" aria-label="A small fee is taken from each sale">
+      <rect x="10" y="14" width="400" height="222" rx="22" fill="var(--card)"/>
+      <text x="210" y="56" text-anchor="middle" font-size="22" font-weight="800" fill="var(--fg)">You sell a shoe for 1,000 coins</text>
+      <rect x="30" y="86" width="360" height="46" rx="12" fill="var(--line)"/>
+      <rect class="grow" style="--dl:.8s" x="30" y="86" width="346" height="46" rx="12" fill="#00a85a"/>
+      <rect class="grow" style="--dl:1.6s" x="372" y="86" width="18" height="46" rx="6" fill="#e5383b"/>
+      <g class="pop" style="--dl:1.8s"><text x="200" y="170" text-anchor="middle" font-size="30" font-weight="800" fill="#00a85a">You get 960</text></g>
+      <g class="pop" style="--dl:2.4s"><text x="210" y="204" text-anchor="middle" font-size="16" font-weight="700" fill="#e5383b">Small fee: 40 coins (4%)</text></g>
+      <g class="pop" style="--dl:3s"><text x="210" y="226" text-anchor="middle" font-size="12" font-weight="700" fill="var(--mut)">The fee can change. The Government tab always shows it.</text></g>
+    </svg>
+    <p class="cap">When you sell to offers or to players, a small fee is taken from the sale.<small>You always see how much you will get before you accept.</small></p></section>
+
+  <!-- 6 -->
+  <section class="scene" data-n="6"><div class="step"></div><h2>Sell to players</h2><div class="where ss">In <b>SoleSmith</b>: My inventory, then List for players</div>
+    <svg viewBox="0 0 420 250" role="img" aria-label="Selling to another player">
+      <g>
+        <rect x="10" y="20" width="250" height="200" rx="20" fill="var(--card)"/>
+        <use href="#shoe" x="30" y="36" width="200" height="105" style="--a:#6c3cff;--b:#ffd23f;--c:#ffffff;--d:#ffffff;--e:#0b0b0f"/>
+        <g class="pop" style="--dl:.5s"><rect x="40" y="160" width="180" height="40" rx="12" fill="#ff5a36"/><text x="130" y="187" text-anchor="middle" font-size="17" font-weight="800" fill="#ffffff">Your price: 5,000</text></g>
+        <g class="pop" style="--dl:1.4s"><circle cx="330" cy="100" r="30" fill="var(--line)"/><circle cx="330" cy="92" r="11" fill="var(--mut)"/><path d="M308 122 Q330 98 352 122 Z" fill="var(--mut)"/></g>
+        <g class="pop" style="--dl:2s"><rect x="290" y="148" width="80" height="34" rx="12" fill="#00a85a"/><text x="330" y="171" text-anchor="middle" font-size="15" font-weight="800" fill="#ffffff">Buy!</text></g>
+        <g class="rise" style="--dl:2.6s"><use href="#coin" x="140" y="120" width="36" height="36"/></g>
+      </g>
+    </svg>
+    <p class="cap">Pick your own price. Other players buy it in the Player market tab.<small>You can cancel your listing any time.</small></p></section>
+
+  <!-- 6b -->
+  <section class="scene" data-n="6b"><div class="step"></div><h2>Ask a player</h2><div class="where ss">In <b>SoleSmith</b>: click a player name to open their profile</div>
+    <svg viewBox="0 0 420 250" role="img" aria-label="Requesting a shoe and getting a message">
+      <g class="pop" style="--dl:.2s"><rect x="8" y="20" width="196" height="204" rx="16" fill="var(--card)"/><text x="24" y="46" font-size="14" font-weight="800" fill="var(--fg)">Sam's profile</text>
+        <rect x="22" y="58" width="168" height="76" rx="10" fill="#efece6"/><use href="#shoe" x="40" y="62" width="132" height="70" style="--a:#e63946;--b:#ffffff;--c:#0b0b0f;--d:#ffffff;--e:#a4161a"/>
+        <g class="press" style="--dl:1.2s"><rect x="22" y="146" width="168" height="34" rx="11" fill="#ff5a36"/><text x="106" y="168" text-anchor="middle" font-size="13" font-weight="800" fill="#ffffff">Request this shoe</text></g>
+        <text x="106" y="204" text-anchor="middle" font-size="13" font-weight="700" fill="var(--mut)">You offer 6,000 coins</text></g>
+      <path class="fade" style="--dl:1.8s" d="M208 122 L226 122 M219 114 L226 122 L219 130" fill="none" stroke="var(--mut)" stroke-width="4" stroke-linecap="round"/>
+      <g class="pop" style="--dl:2.1s"><rect x="228" y="20" width="184" height="204" rx="16" fill="var(--card)"/><text x="244" y="46" font-size="14" font-weight="800" fill="var(--fg)">Inbox</text>
+        <circle cx="388" cy="40" r="13" fill="#e5383b"/><text x="388" y="45" text-anchor="middle" font-size="14" font-weight="800" fill="#ffffff">1</text>
+        <rect x="240" y="60" width="160" height="70" rx="12" fill="var(--bg)"/><text x="252" y="82" font-size="12" font-weight="800" fill="var(--fg)">Alex wants your shoe</text><text x="252" y="102" font-size="12" font-weight="700" fill="var(--mut)">for 6,000 coins</text>
+        <g class="press" style="--dl:3.4s"><rect x="240" y="146" width="76" height="34" rx="11" fill="#00a85a"/><text x="278" y="168" text-anchor="middle" font-size="13" font-weight="800" fill="#ffffff">Accept</text></g>
+        <rect x="324" y="146" width="76" height="34" rx="11" fill="var(--line)"/><text x="362" y="168" text-anchor="middle" font-size="13" font-weight="800" fill="var(--fg)">Decline</text>
+        <g class="rise" style="--dl:3.9s"><use href="#coin" x="300" y="184" width="30" height="30"/></g></g>
+    </svg>
+    <p class="cap">Want a shoe someone owns? Open their profile and press Request.<small>They get a message in their Inbox, even if they are away. They can accept or decline.</small></p></section>
+
+  <!-- 7 -->
+  <section class="scene" data-n="7"><div class="step"></div><h2>Collections</h2><div class="where ss">In <b>SoleSmith</b>: Collections tab</div>
+    <svg viewBox="0 0 420 250" role="img" aria-label="Collecting ten shoes">
+      <text x="210" y="26" text-anchor="middle" font-size="15" font-weight="800" fill="var(--mut)">Collection: Grateful Dead</text>
+      <g>
+        <rect x="14" y="40" width="68" height="62" rx="12" fill="var(--card)"/><use class="pop" style="--dl:.3s;--a:#e63946;--b:#ffd23f;--c:#2ecc71;--d:#ffffff;--e:#0b0b0f" href="#shoe" x="18" y="48" width="60" height="32"/>
+        <rect x="90" y="40" width="68" height="62" rx="12" fill="var(--card)"/><use class="pop" style="--dl:.55s;--a:#ffd23f;--b:#6c3cff;--c:#e63946;--d:#ffffff;--e:#0b0b0f" href="#shoe" x="94" y="48" width="60" height="32"/>
+        <rect x="166" y="40" width="68" height="62" rx="12" fill="var(--card)"/><use class="pop" style="--dl:.8s;--a:#2ecc71;--b:#ff7a1a;--c:#ffffff;--d:#ffffff;--e:#0b0b0f" href="#shoe" x="170" y="48" width="60" height="32"/>
+        <rect x="242" y="40" width="68" height="62" rx="12" fill="var(--card)"/><use class="pop" style="--dl:1.05s;--a:#6c3cff;--b:#ff4fa3;--c:#ffd23f;--d:#ffffff;--e:#0b0b0f" href="#shoe" x="246" y="48" width="60" height="32"/>
+        <rect x="318" y="40" width="68" height="62" rx="12" fill="var(--card)"/><use class="pop" style="--dl:1.3s;--a:#ff7a1a;--b:#2e86ff;--c:#ffffff;--d:#ffffff;--e:#0b0b0f" href="#shoe" x="322" y="48" width="60" height="32"/>
+        <rect x="14" y="112" width="68" height="62" rx="12" fill="var(--card)"/><use class="pop" style="--dl:1.55s;--a:#2e86ff;--b:#ffd23f;--c:#e63946;--d:#ffffff;--e:#0b0b0f" href="#shoe" x="18" y="120" width="60" height="32"/>
+        <rect x="90" y="112" width="68" height="62" rx="12" fill="var(--card)"/><use class="pop" style="--dl:1.8s;--a:#ff4fa3;--b:#2ecc71;--c:#ffffff;--d:#ffffff;--e:#0b0b0f" href="#shoe" x="94" y="120" width="60" height="32"/>
+        <rect x="166" y="112" width="68" height="62" rx="12" fill="var(--card)"/><use class="pop" style="--dl:2.05s;--a:#ffffff;--b:#e63946;--c:#6c3cff;--d:#ffffff;--e:#0b0b0f" href="#shoe" x="170" y="120" width="60" height="32"/>
+        <rect x="242" y="112" width="68" height="62" rx="12" fill="var(--card)"/><use class="pop" style="--dl:2.3s;--a:#00c2a8;--b:#ffd23f;--c:#ff7a1a;--d:#ffffff;--e:#0b0b0f" href="#shoe" x="246" y="120" width="60" height="32"/>
+      </g>
+      <rect class="pulse" x="318" y="112" width="68" height="62" rx="12" fill="var(--card)" stroke="#ffb400" stroke-width="4"/>
+      <text x="352" y="154" text-anchor="middle" font-size="34" font-weight="800" fill="#ffb400">?</text>
+      <g class="pop" style="--dl:2.8s"><rect x="296" y="180" width="112" height="26" rx="13" fill="#ffb400"/><text x="352" y="198" text-anchor="middle" font-size="13" font-weight="800" fill="#1b1626">GRAIL: drop only</text></g>
+      <g class="pop" style="--dl:3.6s"><rect x="14" y="196" width="250" height="44" rx="14" fill="#00a85a"/><text x="139" y="226" text-anchor="middle" font-size="22" font-weight="800" fill="#ffffff">Prize: +60,000 coins</text></g>
+    </svg>
+    <p class="cap">Collect all 10 shoes in a set for a big prize.<small>The grail only comes from a drop, and only ONE exists in the whole game!</small></p></section>
+
+  <!-- 8 -->
+  <section class="scene" data-n="8"><div class="step"></div><h2>Workers</h2><div class="where ss">In <b>SoleSmith</b>: Workers tab</div>
+    <svg viewBox="0 0 420 250" role="img" aria-label="Workers making coins">
+      <rect x="10" y="10" width="400" height="230" rx="22" fill="var(--card)"/>
+      <g fill="var(--mut)">
+        <g class="pop" style="--dl:.2s"><circle cx="60" cy="150" r="15"/><rect x="44" y="168" width="32" height="40" rx="10"/></g>
+        <g class="pop" style="--dl:.45s"><circle cx="140" cy="150" r="15"/><rect x="124" y="168" width="32" height="40" rx="10"/></g>
+        <g class="pop" style="--dl:.7s"><circle cx="220" cy="150" r="15"/><rect x="204" y="168" width="32" height="40" rx="10"/></g>
+        <g class="pop" style="--dl:.95s"><circle cx="300" cy="150" r="15"/><rect x="284" y="168" width="32" height="40" rx="10"/></g>
+        <g class="pop" style="--dl:1.2s"><circle cx="380" cy="150" r="15"/><rect x="364" y="168" width="32" height="40" rx="10"/></g>
+      </g>
+      <g class="rise" style="--dl:1.4s"><use href="#coin" x="40" y="90" width="34" height="34"/><text x="94" y="114" font-size="18" font-weight="800" fill="#ffb400">+30</text></g>
+      <g class="rise" style="--dl:1.8s"><use href="#coin" x="118" y="90" width="34" height="34"/><text x="172" y="114" font-size="18" font-weight="800" fill="#ffb400">+45</text></g>
+      <g class="rise" style="--dl:2.2s"><use href="#coin" x="198" y="90" width="34" height="34"/><text x="252" y="114" font-size="18" font-weight="800" fill="#ffb400">+60</text></g>
+      <g class="rise" style="--dl:2.6s"><use href="#coin" x="276" y="90" width="34" height="34"/><text x="330" y="114" font-size="18" font-weight="800" fill="#ffb400">+80</text></g>
+      <g class="rise" style="--dl:3s"><use href="#coin" x="356" y="90" width="34" height="34"/><text x="400" y="114" text-anchor="end" font-size="18" font-weight="800" fill="#ffb400">+100</text></g>
+      <text x="210" y="40" text-anchor="middle" font-size="16" font-weight="800" fill="var(--fg)">Every 2 minutes</text>
+      <text x="210" y="228" text-anchor="middle" font-size="14" font-weight="700" fill="var(--mut)">Up to 5 workers. Better ones pay more.</text>
+    </svg>
+    <p class="cap">Hire up to 5 workers. They pay you coins every 2 minutes.</p></section>
+
+  <!-- 9 -->
+  <section class="scene" data-n="9"><div class="step"></div><h2>Missions and ranking</h2><div class="where ss">In <b>SoleSmith</b>: Missions and Leaderboard tabs</div>
+    <svg viewBox="0 0 420 250" role="img" aria-label="Missions and a leaderboard">
+      <rect x="10" y="10" width="200" height="230" rx="20" fill="var(--card)"/>
+      <text x="26" y="40" font-size="15" font-weight="800" fill="var(--fg)">Daily missions</text>
+      <g font-size="13" font-weight="700" fill="var(--fg)">
+        <rect x="26" y="58" width="24" height="24" rx="7" fill="var(--line)"/><path class="tick" style="--dl:.6s" d="M31 70 L37 76 L46 64" fill="none" stroke="#00a85a" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/><text x="60" y="76">Buy 3 shoes</text>
+        <rect x="26" y="102" width="24" height="24" rx="7" fill="var(--line)"/><path class="tick" style="--dl:1.4s" d="M31 114 L37 120 L46 108" fill="none" stroke="#00a85a" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/><text x="60" y="120">Grab a drop</text>
+        <rect x="26" y="146" width="24" height="24" rx="7" fill="var(--line)"/><path class="tick" style="--dl:2.2s" d="M31 158 L37 164 L46 152" fill="none" stroke="#00a85a" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/><text x="60" y="164">Sell a shoe</text>
+      </g>
+      <g class="pop" style="--dl:3s"><rect x="26" y="190" width="168" height="34" rx="12" fill="#ffb400"/><text x="110" y="212" text-anchor="middle" font-size="15" font-weight="800" fill="#1b1626">Claim coins!</text></g>
+      <rect x="222" y="10" width="188" height="230" rx="20" fill="var(--card)"/>
+      <text x="238" y="40" font-size="15" font-weight="800" fill="var(--fg)">Leaderboard</text>
+      <g class="slide" style="--dl:3.2s;--ty:46px"><rect x="236" y="58" width="160" height="40" rx="12" fill="var(--line)"/><text x="250" y="83" font-size="14" font-weight="800" fill="var(--fg)">#1 Alex</text></g>
+      <g class="slide" style="--dl:3.2s;--ty:46px"><rect x="236" y="104" width="160" height="40" rx="12" fill="var(--line)"/><text x="250" y="129" font-size="14" font-weight="800" fill="var(--fg)">#2 Sam</text></g>
+      <g class="slide" style="--dl:3.2s;--ty:-92px"><rect x="236" y="150" width="160" height="40" rx="12" fill="#ff5a36"/><text x="250" y="175" font-size="14" font-weight="800" fill="#ffffff">#3 You</text></g>
+      <g class="pop" style="--dl:4.2s"><text x="316" y="222" text-anchor="middle" font-size="16" font-weight="800" fill="#ffb400">You are #1!</text></g>
+    </svg>
+    <p class="cap">Do daily missions for coins. Climb the leaderboard.</p></section>
+
+  <!-- 10 -->
+  <section class="scene" data-n="10"><div class="step"></div><h2>Giveaways</h2><div class="where ss">In <b>SoleSmith</b>: Giveaways tab</div>
+    <svg viewBox="0 0 420 250" role="img" aria-label="A gift box opening">
+      <rect x="10" y="10" width="400" height="230" rx="22" fill="var(--card)"/>
+      <g class="pop" style="--dl:1.6s"><use href="#shoe" x="130" y="30" width="160" height="84" style="--a:#2ecc71;--b:#ffffff;--c:#ffd23f;--d:#ffffff;--e:#0b0b0f"/></g>
+      <rect x="150" y="130" width="120" height="80" rx="8" fill="#ff5a36"/>
+      <rect x="199" y="130" width="22" height="80" fill="#ffd23f"/>
+      <g class="lid" style="--dl:1.2s"><rect x="140" y="112" width="140" height="26" rx="8" fill="#e8481f"/><rect x="199" y="112" width="22" height="26" fill="#ffd23f"/></g>
+      <g class="pop" style="--dl:2s"><rect x="290" y="58" width="104" height="38" rx="12" fill="#00a85a" transform="rotate(8 342 77)"/><text x="342" y="84" text-anchor="middle" font-size="19" font-weight="800" fill="#ffffff" transform="rotate(8 342 77)">FREE!</text></g>
+      <g class="pop" style="--dl:2.8s"><rect x="30" y="196" width="130" height="34" rx="12" fill="#ff5a36"/><text x="95" y="218" text-anchor="middle" font-size="14" font-weight="800" fill="#ffffff">Get it free</text></g>
+      <circle class="pulse" cx="140" cy="226" r="14" fill="none" stroke="var(--fg)" stroke-width="3" style="animation-delay:3s"/>
+    </svg>
+    <p class="cap">The owner lists shoes in Giveaways. The first players to press the button win!</p></section>
+
+  <!-- 10b -->
+  <section class="scene" data-n="10b"><div class="step"></div><h2>Good to know</h2>
+    <svg viewBox="0 0 420 250" role="img" aria-label="Helpful buttons">
+      <g class="pop" style="--dl:.2s"><rect x="10" y="12" width="400" height="52" rx="14" fill="var(--card)"/><circle cx="40" cy="38" r="15" fill="#ff5a36"/><text x="40" y="44" text-anchor="middle" font-size="16" font-weight="800" fill="#ffffff">?</text><text x="68" y="44" font-size="14" font-weight="700" fill="var(--fg)">Forgot your password? Press it on Sign in.</text></g>
+      <g class="pop" style="--dl:.9s"><rect x="10" y="74" width="400" height="52" rx="14" fill="var(--card)"/><circle cx="40" cy="100" r="15" fill="#2e86ff"/><text x="40" y="106" text-anchor="middle" font-size="16" font-weight="800" fill="#ffffff">!</text><text x="68" y="106" font-size="14" font-weight="700" fill="var(--fg)">Problem or idea? Open the Feedback tab.</text></g>
+      <g class="pop" style="--dl:1.6s"><rect x="10" y="136" width="400" height="52" rx="14" fill="var(--card)"/><circle cx="40" cy="162" r="15" fill="#ffb400"/><text x="40" y="168" text-anchor="middle" font-size="16" font-weight="800" fill="#1b1626">1</text><text x="68" y="168" font-size="14" font-weight="700" fill="var(--fg)">Drop alert button: a beep 1 minute before drops.</text></g>
+      <g class="pop" style="--dl:2.3s"><rect x="10" y="198" width="400" height="44" rx="14" fill="var(--card)"/><circle cx="40" cy="220" r="15" fill="#6c3cff"/><text x="40" y="226" text-anchor="middle" font-size="16" font-weight="800" fill="#ffffff">*</text><text x="68" y="226" font-size="14" font-weight="700" fill="var(--fg)">Light or Dark mode button for how it looks.</text></g>
+    </svg>
+    <p class="cap">A few buttons that help.<small>Also check the Hall of fame tab to see who owns each grail.</small></p></section>
+
+  <!-- 11 -->
+  <section class="scene" data-n="11" data-fixed="1"><div class="step">Ready?</div><h2>Go play!</h2>
+    <svg viewBox="0 0 420 150" role="img" aria-label="A shoe">
+      <g class="pop"><use href="#shoe" x="110" y="10" width="200" height="105" style="--a:#e63946;--b:#ffffff;--c:#ffd23f;--d:#ffffff;--e:#0b0b0f"/></g>
+      <use class="dropin" style="--dl:.3s" href="#coin" x="70" y="96" width="34" height="34"/><use class="dropin" style="--dl:.5s" href="#coin" x="316" y="96" width="34" height="34"/>
+    </svg>
+    <div class="end">
+      <a class="pri" href="https://mohamednaser2143-sudo.github.io/solesmith/">Play SoleSmith</a>
+      <a href="https://mohamednaser2143-sudo.github.io/solex/">Go to the SoleX shop</a>
+      <a href="how-to-play-full.html">Read the full guide</a>
+      <button id="again">Watch again</button>
+    </div></section>
+  </div>
+
+  <div class="ctl"><button id="prev">Back</button><button id="pp" class="pri">Pause</button><button id="next">Next</button></div>
+  <noscript><p style="margin-top:14px;text-align:center">This page needs JavaScript. <a href="how-to-play-full.html" style="color:var(--coral)">Read the full guide instead.</a></p></noscript>
 </div>
-<div class="toc"><a href="#start">Start</a><a href="#shop">The shop</a><a href="#drops">Drops</a><a href="#sell">Selling</a><a href="#sets">Collections</a><a href="#workers">Workers</a><a href="#missions">Missions</a><a href="#rank">Ranking</a><a href="#people">Profiles</a><a href="#hall">Hall of fame</a><a href="#look">Dark mode</a><a href="#fee">Fee</a><a href="#alert">Drop alert</a><a href="#pass">Password</a><a href="#bulk">Bulk selling</a><a href="#give">Giveaways</a><a href="#help">Feedback</a><a href="#premium">Premium</a></div>
-
-<section id="start"><h2>1. How to start</h2>
-<ul>
-<li>There are two websites. <b>SoleX</b> is the shop where you buy shoes. <b>SoleSmith</b> is your game, where your shoes live.</li>
-<li>Press <b>Sign in</b>, type an email and a password, and press <b>Create account</b>. Use the same email and password on both websites.</li>
-<li>You start with <b class="c">1,000 coins</b>. Coins are the money in the game.</li>
-</ul>
-<div class="tip">Your shoes are in <b>My inventory</b> in SoleSmith. Press <b>Change name</b> to pick a name for the leaderboard.</div></section>
-
-<section id="shop"><h2>2. Buying from the shop (SoleX)</h2>
-<ul>
-<li>Click a shoe, pick a size, type how many pairs you want (1 to 10), and press <b>Buy now</b>. The shoes go straight into your inventory.</li>
-<li>Prices <b>change every 3 minutes</b> by a few coins, up or down. The chart shows how the price moved. Buy low, sell high.</li>
-<li>Shoes called <b>Low</b> are normal sneakers. Shoes called <b>High</b> are high-tops and cost a little more.</li>
-<li>Use the filter buttons on top to find Low, High, a rarity, or one of the collections.</li>
-</ul></section>
-
-<section id="drops"><h2>3. Drops</h2>
-<ul>
-<li>A new <b>drop</b> appears at the top of SoleX <b>every 10 minutes</b>. A drop is a special shoe that is not in the shop.</li>
-<li>Every drop costs only <b class="c">200 coins</b>, but there are not many. <b>The first person to click gets it.</b></li>
-<li>You cannot pick the size. The size is chosen for you when the drop appears.</li>
-<li>There are two kinds of drops: <b>cheap drops</b> (worth about 1,000 to 3,000 coins, 5 to 10 available) and <b>good drops</b> (worth about 10,000 to 30,000 coins, only 1 or 2 available).</li>
-<li>Sometimes the drop is a <b>GRAIL</b>. See the Collections part below.</li>
-</ul>
-<div class="tip">A shoe you get for 200 coins can be worth thousands. Stay on SoleX and be fast!</div></section>
-
-<section id="sell"><h2>4. Selling your shoes</h2>
-<p>Open <b>My inventory</b> in SoleSmith. Every shoe has two ways to sell:</p>
-<ul>
-<li><b>Get offers:</b> you get 3 random offers from buyers. Pick one and the shoe is sold right away. Offers last 3 minutes. A normal shoe only makes a few coins of profit. A <b>drop shoe</b> sells for around what it is worth, so the profit is big.</li>
-<li><b>List for players:</b> you pick your own price and other players can buy it on the <b>Player market</b>. You get the coins when someone buys it. You can cancel your listing at any time.</li>
-</ul>
-<div class="tip"><b>Grail shoes</b> cannot be sold to offers. You can only sell them to players, or keep them.</div></section>
-
-<section id="sets"><h2>5. Collections and grails</h2>
-<p>A <b>collection</b> is a set of 10 shoes with the same first name. Nine of them are sold in the SoleX shop. The tenth is the <b>GRAIL</b>.</p>
-<ul>
-<li>A grail never appears in the shop. It only comes from a <b>drop</b>, and you have to wait for it.</li>
-<li>There is only <b>one copy of each grail</b> in the whole game. When someone buys it, it will never drop again.</li>
-<li>Own all 10 shoes of a set (in your inventory) and press <b>Claim</b> in the <b>Collections</b> tab to get the prize. You keep your shoes after you claim it, and you can claim each set once.</li>
-</ul>
-<table><tr><th>Collection</th><th>Prize</th></tr>
-<tr><td>Grateful Dead</td><td>60,000 coins</td></tr>
-<tr><td>Jungle Fever (greens)</td><td>25,000 coins</td></tr>
-<tr><td>Desert Sun (oranges)</td><td>30,000 coins</td></tr>
-<tr><td>Red Rocket (reds)</td><td>35,000 coins</td></tr>
-<tr><td>Deep Ocean (blues)</td><td>28,000 coins</td></tr></table>
-<div class="tip">Every shoe in a set has the set name in brackets at the end, like <b>(Set Deep Ocean)</b>, so you always know which collection it belongs to.</div></section>
-
-<section id="workers"><h2>6. Workers (free coins)</h2>
-<p>Workers make coins for you, even while you are away. Go to the <b>Workers</b> tab and hire up to <b>5 workers</b>. Better workers cost more and pay more. Each one pays every 2 minutes:</p>
-<table><tr><th>Worker</th><th>Cost</th><th>Pays every 2 minutes</th></tr>
-<tr><td>1</td><td>500</td><td>30</td></tr><tr><td>2</td><td>1,000</td><td>45</td></tr><tr><td>3</td><td>2,000</td><td>60</td></tr><tr><td>4</td><td>4,000</td><td>80</td></tr><tr><td>5</td><td>8,000</td><td>100</td></tr></table>
-<p>With all 5 workers you earn 315 coins every 2 minutes. Coins are saved for you for up to 1 day when you are away.</p></section>
-
-<section id="missions"><h2>7. Daily missions</h2>
-<p>Open the <b>Missions</b> tab. Finish a mission and press <b>Claim</b> to get coins. Missions start over every day.</p>
-<ul>
-<li>Buy 3 shoes from SoleX: 150 coins</li>
-<li>Sell 2 shoes to offers: 100 coins</li>
-<li>Grab a shoe from a drop: 300 coins</li>
-<li>List a shoe for other players: 100 coins</li>
-<li>Buy a shoe from another player: 150 coins</li>
-<li>Sell a shoe to another player: 200 coins</li>
-</ul></section>
-
-<section id="rank"><h2>8. Net worth and the leaderboard</h2>
-<ul>
-<li><b>Net worth</b> is your coins plus the value of every shoe you own. You see it at the top of SoleSmith.</li>
-<li>The <b>Leaderboard</b> shows the 20 richest players. Climb it by buying smart, selling well, and collecting rare shoes.</li>
-</ul>
-<div class="tip"><b>Quick plan:</b> buy a cheap shoe, hire your first worker, check every drop, and finish your daily missions.</div></section>
-
-<section id="people"><h2>9. Profiles, requests and showcase</h2>
-<ul>
-<li>Click any player name (on the leaderboard, the player market or the hall of fame) to open their <b>profile</b>. You see their net worth, their finished collections, their showcase and their shoes.</li>
-<li>Want a shoe from someone's inventory? Press <b>Request this shoe</b> and type how many coins you offer. They get a message in their <b>Inbox</b>. If they are online they see it right away. If they are away, it waits for them until they come back.</li>
-<li>In the <b>Inbox</b> they press <b>Accept</b> (the shoe goes to you and the coins go to them) or <b>Decline</b>. You get a message back about what they chose. You can cancel a request you sent while it is waiting.</li>
-<li>The <b>Showcase</b> is up to 3 of your best shoes shown at the top of your profile. In <b>My inventory</b>, press <b>Add to showcase</b> on a shoe.</li>
-</ul>
-<div class="tip">Everyone who plays can see your profile and your shoes. A request is only an offer. Nothing happens unless you accept it.</div></section>
-
-<section id="hall"><h2>10. Grail hall of fame</h2>
-<p>The <b>Hall of fame</b> tab lists every grail shoe in the game. For each one it shows if it is still hiding in the drops, or who owns it and since when. Click the owner's name to see their profile.</p></section>
-
-<section id="look"><h2>11. Dark and light mode</h2>
-<p>Press the <b>Light mode / Dark mode</b> button at the top of the page to change how the websites look. The choice is remembered for next time.</p></section>
-
-<section id="fee"><h2>12. The sales fee (Government tab)</h2>
-<ul>
-<li>When you <b>sell</b> a shoe, a small <b>fee</b> is taken. It is 4% right now. This happens when you sell to offers, to a player on the player market, or to a player who asked for your shoe.</li>
-<li>You get the price <b>minus the fee</b>. The player who buys pays the full price. The fee goes to the game owner.</li>
-<li>The owner can change the fee. The <b>Government</b> tab always shows the fee right now, and it updates by itself.</li>
-</ul>
-<div class="tip">Example: you sell a shoe for 1,000 coins with a 4% fee. You get 960 coins. Remember the fee when you pick a price or an offer. Normal shoes only get a few coins of profit from offers, so the fee can make you lose a little. Drop shoes sell for much more, so they are worth it.</div></section>
-
-<section id="alert"><h2>13. Drop alert</h2>
-<p>Press <b>Drop alert</b> at the top of the page to turn it on or off. When it is on, you get a sound and a message <b>1 minute before every drop</b>, and another one when the drop starts. It works on both websites while the page is open.</p></section>
-
-<section id="pass"><h2>14. Forgot or change your password</h2>
-<ul>
-<li><b>Forgot it?</b> Press Sign in, type your email, and press <b>Forgot password?</b>. We send you an email. Open the link in it and type a new password.</li>
-<li><b>Want to change it?</b> Sign in and press <b>Change password</b> at the top of SoleSmith.</li>
-</ul></section>
-
-<section id="bulk"><h2>15. Selling lots of shoes at once</h2>
-<p>Got a big stack of the same shoe? In <b>My inventory</b>, press <b>Sell in bulk</b>.</p>
-<ul><li>Pick the shoe name from the list. It shows how many you own.</li>
-<li>Type how many you want to sell, or press <b>All</b>.</li>
-<li>Press <b>Get offers</b>. Every pair sells for the same price. For example, if the offer is 200 coins and you sell 500 pairs, you get 100,000 coins minus the fee.</li></ul>
-<div class="tip">Grail shoes cannot be sold to offers, so they are not in this list.</div></section>
-
-<section id="give"><h2>16. Giveaways</h2>
-<p>The owner puts shoes in the <b>Giveaways</b> tab. Some are cheap and some are free. <b>The first players to press the button get them</b>, and when they are gone, they are gone.</p></section>
-
-<section id="help"><h2>17. Suggestions and problems</h2>
-<p>Found a problem, or have an idea? Open the <b>Feedback</b> tab, pick "A problem" or "A suggestion", write your message and press <b>Send</b>. You can send up to 5 messages a day. You can see if the owner marked it as done.</p></section>
-
-<section id="premium"><h2>18. Premium shoes</h2>
-<p>In SoleX, press the <b>Premium</b> button to see the most expensive shoes (5,000 to 20,000 coins). Their price moves a lot more every 3 minutes, by about 170 to 230 coins.</p></section>
-</div>
+<script>
+const $=s=>document.querySelector(s);
+const sc=[...document.querySelectorAll('.scene')],bars=$('#bars'),app=$('#app');
+const DUR=6600,REDUCED=matchMedia('(prefers-reduced-motion: reduce)').matches;
+let i=0,paused=REDUCED,elapsed=0,raf=0;
+sc.forEach((s,k)=>{const st=s.querySelector('.step');if(st&&!s.dataset.fixed)st.textContent='Step '+(k+1)+' of '+(sc.length-1);const b=document.createElement('button');b.innerHTML='<i></i>';b.setAttribute('aria-label','Go to step '+(k+1));b.onclick=e=>{e.stopPropagation();go(k)};bars.appendChild(b)});
+function counter(){const el=sc[i].querySelector('[data-count]');if(!el)return;const to=+el.dataset.count,d=+el.dataset.delay||0,my=i;el.textContent='0';
+ setTimeout(()=>{if(i!==my)return;const t0=performance.now();(function f(t){const p=Math.min(1,(t-t0)/2000);el.textContent=Math.round(to*(1-Math.pow(1-p,3))).toLocaleString();if(p<1&&i===my)requestAnimationFrame(f)})(t0)},d)}
+function go(n){i=Math.max(0,Math.min(sc.length-1,n));elapsed=0;
+ sc.forEach((s,k)=>s.classList.toggle('on',k===i));
+ [...bars.children].forEach((b,k)=>{b.classList.toggle('done',k<i);b.firstChild.style.width=k<i?'100%':'0'});
+ $('#prev').disabled=i===0;$('#next').textContent=i===sc.length-1?'Start over':'Next';counter()}
+function tick(now){raf=requestAnimationFrame(tick);if(tick.last==null)tick.last=now;const dt=now-tick.last;tick.last=now;
+ if(paused||document.hidden||i===sc.length-1)return;elapsed+=dt;
+ bars.children[i].firstChild.style.width=Math.min(100,elapsed/DUR*100)+'%';
+ if(elapsed>=DUR)go(i+1)}
+function setPause(p){paused=p;app.classList.toggle('paused',p);$('#pp').textContent=p?'Play':'Pause'}
+$('#pp').onclick=()=>setPause(!paused);
+$('#prev').onclick=()=>go(i-1);
+$('#next').onclick=()=>go(i===sc.length-1?0:i+1);
+$('#again').onclick=()=>{go(0);setPause(false)};
+$('#stage').onclick=e=>{if(e.target.closest('a,button'))return;const r=$('#stage').getBoundingClientRect();(e.clientX-r.left<r.width/3)?go(i-1):go(i+1)};
+document.addEventListener('keydown',e=>{if(e.key==='ArrowRight')go(i+1);else if(e.key==='ArrowLeft')go(i-1);else if(e.key===' '&&!e.target.closest('a,button')){e.preventDefault();setPause(!paused)}});
+function setTheme(t){document.documentElement.dataset.theme=t;try{localStorage.setItem('theme',t)}catch(e){}$('#th').textContent=t==='light'?'Dark mode':'Light mode'}
+$('#th').onclick=()=>setTheme(document.documentElement.dataset.theme==='light'?'dark':'light');
+setTheme(document.documentElement.dataset.theme||'dark');
+setPause(paused);go(0);raf=requestAnimationFrame(tick);
+</script>
 </body>
 </html>
