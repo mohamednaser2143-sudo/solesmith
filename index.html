@@ -6,19 +6,21 @@
 <title>SoleSmith - Your Sneaker Inventory</title>
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=Inter:wght@400;600&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
+<script>try{document.documentElement.dataset.theme=localStorage.getItem('theme')||'dark'}catch(e){}</script>
 <style>
-:root{--ink:#1b1626;--ink2:#2a2338;--paper:#efece6;--coral:#ff5a36;--line:#3a3150;--mut:#a79fba}
+:root{--ink:#1b1626;--ink2:#2a2338;--paper:#efece6;--coral:#ff5a36;--line:#3a3150;--mut:#a79fba;--fg:#fff}
+:root[data-theme="light"]{--ink:#f3f0ea;--ink2:#ffffff;--line:#d9d3e3;--mut:#6b6480;--fg:#1b1626}
 *{box-sizing:border-box;margin:0}
-body{font-family:Inter,system-ui,sans-serif;background:var(--ink);color:#fff;min-height:100vh}
+body{font-family:Inter,system-ui,sans-serif;background:var(--ink);color:var(--fg);min-height:100vh}
 header{display:flex;justify-content:space-between;align-items:center;padding:18px 28px;gap:12px;flex-wrap:wrap;max-width:1250px;margin:auto}
 .logo{font-family:Syne,sans-serif;font-weight:800;font-size:26px}.logo b{color:var(--coral)}
 .who{display:flex;gap:12px;align-items:center;font-weight:700}
 #coins,#nw{background:var(--ink2);padding:9px 16px;border-radius:99px}#coins:empty,#nw:empty{display:none}
-.btn{padding:11px 20px;border-radius:14px;border:0;font:700 14px Inter;cursor:pointer;background:var(--line);color:#fff}
-.btn.pri{background:var(--coral)}.btn:hover{filter:brightness(1.12)}
+.btn{padding:11px 20px;border-radius:14px;border:0;font:700 14px Inter;cursor:pointer;background:var(--line);color:var(--fg)}
+.btn.pri{background:var(--coral);color:#fff}.btn:hover{filter:brightness(1.12)}
 .tabs{display:flex;gap:8px;padding:0 28px 18px;max-width:1250px;margin:auto;flex-wrap:wrap}
-.tab{background:transparent;border:1px solid var(--line);color:#fff;padding:10px 20px;border-radius:99px;font:700 14px Inter;cursor:pointer;text-decoration:none}
-.tab.on{background:#fff;color:var(--ink)}
+.tab{background:transparent;border:1px solid var(--line);color:var(--fg);padding:10px 20px;border-radius:99px;font:700 14px Inter;cursor:pointer;text-decoration:none}
+.tab.on{background:var(--fg);color:var(--ink)}
 .view{max-width:1250px;margin:auto;padding:0 28px 60px}
 .view[hidden]{display:none}
 h2{font:800 26px Syne;margin-bottom:8px}
@@ -33,16 +35,21 @@ h2{font:800 26px Syne;margin-bottom:8px}
 .ov{position:fixed;inset:0;background:rgba(0,0,0,.65);display:none;align-items:center;justify-content:center;padding:16px;z-index:10}
 .ov.on{display:flex}
 .am{background:var(--ink2);border-radius:24px;padding:28px;max-width:400px;width:100%}
-.am input{width:100%;padding:13px;border-radius:12px;border:1px solid var(--line);background:var(--ink);color:#fff;font:15px Inter;margin:8px 0}
+.am input{width:100%;padding:13px;border-radius:12px;border:1px solid var(--line);background:var(--ink);color:var(--fg);font:15px Inter;margin:8px 0}
 .two{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px}
 .of{display:flex;justify-content:space-between;align-items:center;gap:10px;background:var(--ink);padding:12px;border-radius:12px;margin-top:8px}
 .mbar{height:10px;background:var(--ink);border-radius:9px;margin:12px 4px 0;overflow:hidden}.mbar i{display:block;height:100%;background:linear-gradient(90deg,var(--coral),#ffb400)}
 .lbr{display:grid;grid-template-columns:50px 1fr 130px 210px;gap:10px;align-items:center;background:var(--ink2);padding:13px 16px;border-radius:14px;margin-bottom:8px}.lbr.me{outline:2px solid var(--coral)}.lbr small{color:var(--mut)}
 @media(max-width:700px){.lbr{grid-template-columns:40px 1fr 100px}.lbr small{display:none}}
 .colset{background:var(--ink2);border-radius:20px;padding:16px;margin-bottom:16px}.colh{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:12px}.colh h3{font:800 20px Syne;margin:0}.colh small{color:var(--mut)}
-.colg{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px}.cs{background:var(--paper);border-radius:12px;padding:8px;color:var(--ink);text-align:center}.cs small{font-weight:600;font-size:11px;display:block}
+.colg{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px}.cs{background:var(--paper);border-radius:12px;padding:8px;color:#1b1626;text-align:center}.cs small{font-weight:600;font-size:11px;display:block}
+.plink{color:var(--coral);text-decoration:none;font-weight:700}
+.phead{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:10px}
+.pst{display:flex;gap:10px;flex-wrap:wrap}.pst span{background:var(--ink2);padding:8px 14px;border-radius:99px}
+.ph3{font:800 18px Syne;margin:18px 0 10px}
+.view .of{background:var(--ink2)}.of.new{outline:2px solid var(--coral)}.of small{color:var(--mut)}
 :focus-visible{outline:3px solid #ffb400;outline-offset:2px}
-#toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(90px);background:#fff;color:var(--ink);padding:12px 20px;border-radius:14px;font-weight:600;transition:transform .3s;z-index:20;max-width:90vw}
+#toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(90px);background:var(--fg);color:var(--ink);padding:12px 20px;border-radius:14px;font-weight:600;transition:transform .3s;z-index:20;max-width:90vw}
 #toast.show{transform:translateX(-50%)}
 @media(max-width:700px){header,.tabs,.view{padding-left:16px;padding-right:16px}}
 </style>
@@ -50,7 +57,7 @@ h2{font:800 26px Syne;margin-bottom:8px}
 <body>
 <header>
   <div class="logo">Sole<b>Smith</b></div>
-  <div class="who"><span id="nw"></span><span id="coins"></span><button class="btn" id="nm">Change name</button><button class="btn pri" id="auth">Sign in</button></div>
+  <div class="who"><span id="nw"></span><span id="coins"></span><button class="btn" id="th">Light mode</button><button class="btn" id="nm">Change name</button><button class="btn pri" id="auth">Sign in</button></div>
 </header>
 <div class="tabs">
   <button class="tab on" data-v="inv">My inventory</button>
@@ -59,6 +66,9 @@ h2{font:800 26px Syne;margin-bottom:8px}
   <button class="tab" data-v="ms">Missions</button>
   <button class="tab" data-v="lb">Leaderboard</button>
   <button class="tab" data-v="col">Collections</button>
+  <button class="tab" data-v="hof">Hall of fame</button>
+  <button class="tab" data-v="in">Inbox <span id="bd"></span></button>
+  <button class="tab" data-v="pf">Profile</button>
   <a class="tab" href="https://mohamednaser2143-sudo.github.io/solex/">Shop at SoleX</a>
   <a class="tab" href="how-to-play.html">How to play</a>
   <a class="tab" id="adm" href="admin.html" hidden>Admin</a>
@@ -70,6 +80,9 @@ h2{font:800 26px Syne;margin-bottom:8px}
 <section class="view" id="v-ms" hidden><h2>Daily missions</h2><p class="msg">Finish missions to earn coins. They reset every day (UTC).</p><div class="cards" id="ms"></div></section>
 <section class="view" id="v-lb" hidden><h2>Leaderboard</h2><p class="msg">Ranked by net worth: your coins plus the value of every shoe you own.</p><div id="lb"></div></section>
 <section class="view" id="v-col" hidden><h2>Collections</h2><p class="msg">Own all 10 shoes of a set to claim its prize. Each set has one GRAIL shoe that only comes from a drop. Only one of each grail exists in the whole game, and it can only be sold to other players. You keep your shoes after claiming.</p><div id="col"></div></section>
+<section class="view" id="v-hof" hidden><h2>Grail hall of fame</h2><p class="msg">Every grail in the game, and who owns it right now. Click a name to see their profile.</p><div id="hof"></div></section>
+<section class="view" id="v-in" hidden><h2>Inbox</h2><p class="msg">Messages and requests from other players. You get these even when you were away.</p><div id="in"></div></section>
+<section class="view" id="v-pf" hidden><div id="pf"></div></section>
 <div class="ov" id="om"><div class="am"><h2>Offers</h2><p class="msg">Pick an offer. Offers expire in 3 minutes.</p><div id="ol"></div></div></div>
 <div class="ov" id="am"><div class="am">
   <h2>Welcome</h2><p class="msg">Create an account and start with 1,000 coins.</p>
@@ -112,25 +125,32 @@ function shoeSVG(c,f,n,h){
  <path d="${TONG}" fill="#000" opacity=".12"/>
  </g>${patch}${laces}${fx}</svg>`;
 }
-let me=null,prof=null,INV=[],MK=[],NW=null,LB=[],MS=[],SETS=[],SHS=[],CL=[];
+let me=null,prof=null,INV=[],MK=[],NW=null,LB=[],MS=[],SETS=[],SHS=[],CL=[],HOF=[],SC=new Set(),NOTES=[],INB=[],SENT=[],PROF=null,LASTUN=-1;
+const VIEWS=['inv','mkt','wk','ms','lb','col','hof','in','pf'];
 async function load(){
  if(!me){prof=null;INV=[];MK=[];return paint()}
  await SB.rpc('collect');
- const [p,i,m,nw,lb,ms,st,sh,cc]=await Promise.all([
+ const [p,i,m,nw,lb,ms,st,sh,cc,hf,scq,nt,ib,sn]=await Promise.all([
   SB.from('profiles').select('*').eq('id',me.id).single(),
   SB.from('inventory').select('*').order('id',{ascending:false}),
   SB.from('listings').select('*').order('id',{ascending:false}),
-  SB.rpc('my_networth'),SB.rpc('leaderboard'),SB.rpc('get_missions'),SB.from('sets').select('*'),SB.from('shop').select('name,colors,finish,hi,set_name,is_grail,taken').not('set_name','is',null),SB.from('collection_claims').select('set_name')]);
- prof=p.data;INV=i.data||[];MK=m.data||[];NW=nw.data;LB=lb.data||[];MS=ms.data||[];SETS=st.data||[];SHS=sh.data||[];CL=(cc.data||[]).map(x=>x.set_name);paint();
+  SB.rpc('my_networth'),SB.rpc('leaderboard'),SB.rpc('get_missions'),SB.from('sets').select('*'),SB.from('shop').select('name,colors,finish,hi,set_name,is_grail,taken').not('set_name','is',null),SB.from('collection_claims').select('set_name'),
+  SB.rpc('hall_of_fame'),SB.from('showcase').select('inv_id'),SB.from('notifications').select('*').order('id',{ascending:false}).limit(30),SB.rpc('get_inbox'),SB.from('requests').select('*').eq('from_uid',me.id).order('id',{ascending:false}).limit(20)]);
+ prof=p.data;INV=i.data||[];MK=m.data||[];NW=nw.data;LB=lb.data||[];MS=ms.data||[];SETS=st.data||[];SHS=sh.data||[];CL=(cc.data||[]).map(x=>x.set_name);
+ HOF=hf.data||[];SC=new Set((scq.data||[]).map(x=>x.inv_id));NOTES=nt.data||[];INB=ib.data||[];SENT=sn.data||[];
+ const un=NOTES.filter(n=>!n.seen).length;
+ if(un>0&&(LASTUN<0||un>LASTUN)&&$('#v-in').hidden)toast('You have '+un+' new message'+(un>1?'s':'')+' in your Inbox');
+ LASTUN=un;paint();
+ if(!$('#v-pf').hidden&&PROF)refreshProf();
 }
 function pic(s){return `<div class="pic"><span style="background:${RC[s.r]||RC.Common}">${esc(s.r)}</span>${shoeSVG(s.c,s.f,s.n,s.h)}</div>`}
 function paint(){
  paint2();
  $('#auth').textContent=me?'Sign out':'Sign in';
  $('#coins').textContent=me&&prof?prof.coins.toLocaleString()+' coins':'';
- $('#inv').innerHTML=INV.map(d=>`<div class="card">${pic(d.shoe)}<p>${esc(d.shoe.n)}</p><small>Size ${esc(d.size)}${d.paid?' &middot; paid '+d.paid:''}${d.shoe.v?' &middot; worth '+d.shoe.v.toLocaleString():''}</small><div class="row">${d.shoe.g?'<small>GRAIL: can only be sold to players</small>':`<button class="btn pri" data-offer="${d.id}">Get offers</button>`}<button class="btn" style="margin-top:8px" data-sell="${d.id}">List for players</button></div></div>`).join('');
+ $('#inv').innerHTML=INV.map(d=>`<div class="card">${pic(d.shoe)}<p>${esc(d.shoe.n)}</p><small>Size ${esc(d.size)}${d.paid?' &middot; paid '+d.paid:''}${d.shoe.v?' &middot; worth '+d.shoe.v.toLocaleString():''}</small><div class="row">${d.shoe.g?'<small>GRAIL: can only be sold to players</small>':`<button class="btn pri" data-offer="${d.id}">Get offers</button>`}<button class="btn" style="margin-top:8px" data-sell="${d.id}">List for players</button><button class="btn" style="margin-top:8px" data-sc="${d.id}">${SC.has(d.id)?'Remove from showcase':'Add to showcase'}</button></div></div>`).join('');
  $('#invmsg').innerHTML=!me?'Sign in to see your shoes.':INV.length?'':`Nothing yet. <a href="${SOLEX}">Buy your first pair at SoleX</a>.`;
- $('#mkt').innerHTML=MK.map(d=>{const own=me&&d.seller===me.id;return `<div class="card">${pic(d.shoe)}<p>${esc(d.shoe.n)}</p><small>Size ${esc(d.size)} &middot; ${d.price.toLocaleString()} coins</small><small>Seller: ${esc(d.seller_name)}</small><div class="row"><button class="btn ${own?'':'pri'}" data-id="${d.id}" data-a="${own?'x':'b'}">${own?'Cancel listing':'Buy'}</button></div></div>`}).join('');
+ $('#mkt').innerHTML=MK.map(d=>{const own=me&&d.seller===me.id;return `<div class="card">${pic(d.shoe)}<p>${esc(d.shoe.n)}</p><small>Size ${esc(d.size)} &middot; ${d.price.toLocaleString()} coins</small><small>Seller: <a href="#" class="plink" data-prof="${d.seller}">${esc(d.seller_name)}</a></small><div class="row"><button class="btn ${own?'':'pri'}" data-id="${d.id}" data-a="${own?'x':'b'}">${own?'Cancel listing':'Buy'}</button></div></div>`}).join('');
  $('#mktmsg').textContent=!me?'Sign in to see listings.':MK.length?'':'No listings yet. Sell a shoe from your inventory.';
  const w=prof?prof.workers:0,cost=500*Math.pow(2,w),PAY=[30,45,60,80,100],earn=PAY.slice(0,w).reduce((a,b)=>a+b,0);
  $('#wk').innerHTML=!me?'<p class="msg">Sign in to hire workers.</p>':`<div class="card" style="max-width:420px"><p style="font-size:20px">Workers: ${w} / 5</p><small>Your workers send you ${earn} coins every 2 minutes right now.${w<5?` Your next worker pays ${PAY[w]} coins every 2 minutes.`:''}</small><div class="row"><button class="btn pri" id="hire" ${w>=5?'disabled':''}>${w>=5?'Max workers reached':'Hire worker '+(w+1)+' for '+cost.toLocaleString()+' coins'}</button></div></div>`;
@@ -141,7 +161,8 @@ async function rpc(fn,args,ok){
  toast(ok);load();
 }
 $('#inv').onclick=async e=>{
- const so=e.target.dataset.sell,of=e.target.dataset.offer;
+ const so=e.target.dataset.sell,of=e.target.dataset.offer,sc=e.target.dataset.sc;
+ if(sc){rpc('toggle_showcase',{p_inv:+sc},'Showcase updated');return}
  if(of){const {data,error}=await SB.rpc('get_offers',{p_inv:+of});if(error)return toast(error.message);
   $('#ol').innerHTML=data.map(o=>`<div class="of"><span><b>${esc(o.buyer)}</b> offers <b>${o.amount.toLocaleString()}</b> coins</span><button class="btn pri" data-o="${o.id}">Accept</button></div>`).join('');
   $('#om').classList.add('on');return}
@@ -154,11 +175,15 @@ $('#om').onclick=async e=>{
  $('#om').classList.remove('on');if(error)return toast(error.message);
  toast('Sold for '+data.toLocaleString()+' coins');load()};
 $('#wk').onclick=e=>{if(e.target.id==='hire')rpc('hire_worker',{},'Worker hired!')};
-$('#mkt').onclick=e=>{const b=e.target.closest('button');if(!b)return;
+$('#mkt').onclick=e=>{const pl=e.target.closest('[data-prof]');if(pl){e.preventDefault();return openProfile(pl.dataset.prof)}
+ const b=e.target.closest('button');if(!b)return;
  b.dataset.a==='x'?rpc('cancel_listing',{p_id:+b.dataset.id},'Back in your inventory'):rpc('buy_listing',{p_id:+b.dataset.id},'Bought! Check your inventory')};
 document.querySelectorAll('.tab[data-v]').forEach(b=>b.onclick=()=>{
  document.querySelectorAll('.tab[data-v]').forEach(t=>t.classList.toggle('on',t===b));
- ['inv','mkt','wk','ms','lb','col'].forEach(v=>$('#v-'+v).hidden=v!==b.dataset.v);load()});
+ showView(b.dataset.v);
+ if(b.dataset.v==='pf'&&me)openProfile(me.id);
+ if(b.dataset.v==='in')markSeen();else load()});
+function showView(v){document.querySelectorAll('.tab[data-v]').forEach(t=>t.classList.toggle('on',t.dataset.v===v));VIEWS.forEach(x=>$('#v-'+x).hidden=x!==v)}
 function paintCol(){
  if(!me){$('#col').innerHTML='<p class="msg">Sign in to see your collections.</p>';return}
  const own=new Set(INV.map(x=>x.shoe.n));
@@ -169,15 +194,56 @@ function paintCol(){
 }
 $('#col').onclick=e=>{const s=e.target.dataset.set;if(s)rpc('claim_collection',{p_set:s},'Collection prize claimed!')};
 function paint2(){
- paintCol();
+ paintCol();paintHof();paintInbox();
  $('#nw').textContent=me&&NW!=null?'Net worth '+Number(NW).toLocaleString():'';
  $('#adm').hidden=!(prof&&prof.is_admin);
- $('#lb').innerHTML=!me?'<p class="msg">Sign in to see the leaderboard.</p>':LB.map((r,k)=>`<div class="lbr${prof&&r.name===prof.name?' me':''}"><b>#${k+1}</b><span>${esc(r.name)}</span><b>${Number(r.networth).toLocaleString()}</b><small>${Number(r.coins).toLocaleString()} coins &middot; ${r.shoes} shoes</small></div>`).join('');
+ $('#lb').innerHTML=!me?'<p class="msg">Sign in to see the leaderboard.</p>':LB.map((r,k)=>`<div class="lbr${prof&&r.name===prof.name?' me':''}"><b>#${k+1}</b><span><a href="#" class="plink" data-prof="${r.uid}">${esc(r.name)}</a></span><b>${Number(r.networth).toLocaleString()}</b><small>${Number(r.coins).toLocaleString()} coins &middot; ${r.shoes} shoes</small></div>`).join('');
  $('#ms').innerHTML=!me?'<p class="msg">Sign in to see missions.</p>':MS.map(m=>{const done=m.progress>=m.target,can=done&&!m.claimed,pc=Math.min(100,Math.round(m.progress/m.target*100));
   return `<div class="card"><p>${esc(m.title)}</p><small>${Math.min(m.progress,m.target)} / ${m.target} &middot; reward ${m.reward} coins</small><div class="mbar"><i style="width:${pc}%"></i></div><div class="row"><button class="btn ${can?'pri':''}" data-claim="${m.mid}" ${can?'':'disabled'}>${m.claimed?'Claimed today':done?'Claim '+m.reward+' coins':'Not finished yet'}</button></div></div>`}).join('');
 }
 $('#ms').onclick=e=>{const id=e.target.dataset.claim;if(id)rpc('claim_mission',{p_id:+id},'Mission reward claimed!')};
 $('#nm').onclick=()=>{if(!me)return $('#am').classList.add('on');const n=prompt('Pick a name (3-16 letters, numbers or _)',prof?prof.name:'');if(n)rpc('set_name',{p_name:n},'Name changed')};
+async function markSeen(){await SB.rpc('mark_seen');await load()}
+function paintHof(){
+ $('#hof').innerHTML=!me?'<p class="msg">Sign in to see the hall of fame.</p>':'<div class="cards">'+HOF.map(x=>{const s={n:x.grail,c:x.colors,f:x.finish,h:true,r:'Grail'};
+  const who=x.taken?(x.owner_name?'Owner: <a href="#" class="plink" data-prof="'+x.owner_uid+'">'+esc(x.owner_name)+'</a>'+(x.for_sale?' (for sale)':'')+' &middot; since '+new Date(x.since).toLocaleDateString():'Found, owner unknown'):'Still hiding in the drops. Nobody has found it yet.';
+  return '<div class="card">'+pic(s)+'<p>'+esc(x.grail)+'</p><small>Collection: '+esc(x.set_name)+'</small><small>'+who+'</small></div>'}).join('')+'</div>';
+}
+$('#hof').onclick=e=>{const u=e.target.dataset.prof;if(u){e.preventDefault();openProfile(u)}};
+$('#lb').onclick=e=>{const u=e.target.dataset.prof;if(u){e.preventDefault();openProfile(u)}};
+function paintInbox(){
+ const un=NOTES.filter(n=>!n.seen).length,bd=un+INB.length;
+ $('#bd').textContent=bd?'('+bd+')':'';
+ if(!me){$('#in').innerHTML='<p class="msg">Sign in to see your inbox.</p>';return}
+ $('#in').innerHTML='<h3 class="ph3">Requests for your shoes</h3>'+(INB.map(r=>'<div class="of"><span><b>'+esc(r.from_name)+'</b> wants <b>'+esc(r.shoe.n)+'</b> (size '+esc(r.size)+') for <b>'+r.offer.toLocaleString()+'</b> coins</span><span><button class="btn pri" data-acc="'+r.id+'">Accept</button> <button class="btn" data-dec="'+r.id+'">Decline</button></span></div>').join('')||'<p class="msg">No requests right now.</p>')
+  +'<h3 class="ph3">Messages</h3>'+(NOTES.map(n=>'<div class="of'+(n.seen?'':' new')+'"><span>'+esc(n.text)+'</span><small>'+new Date(n.created).toLocaleString()+'</small></div>').join('')||'<p class="msg">No messages yet.</p>')
+  +'<h3 class="ph3">Requests you sent</h3>'+(SENT.map(r=>'<div class="of"><span>'+esc(r.shoe.n)+' for '+r.offer.toLocaleString()+' coins: <b>'+esc(r.status)+'</b></span>'+(r.status==='pending'?'<button class="btn" data-can="'+r.id+'">Cancel</button>':'')+'</div>').join('')||'<p class="msg">You have not asked for any shoes.</p>');
+}
+$('#in').onclick=e=>{const d=e.target.dataset;
+ if(d.acc)rpc('accept_request',{p_id:+d.acc},'Sold! The coins are yours.');
+ else if(d.dec)rpc('decline_request',{p_id:+d.dec},'Request declined');
+ else if(d.can)rpc('cancel_request',{p_id:+d.can},'Request cancelled')};
+async function openProfile(uid){showView('pf');await refreshProf(uid)}
+async function refreshProf(uid){
+ const {data,error}=await SB.rpc('get_profile',{p_uid:uid||(PROF&&PROF.uid)});
+ if(error)return toast(error.message);PROF=data;paintProf();
+}
+function paintProf(){
+ const p=PROF;
+ if(!p){$('#pf').innerHTML='<h2>Profile</h2><p class="msg">Click a player name on the leaderboard, the market or the hall of fame to see their profile.</p>';return}
+ const mine=me&&p.uid===me.id;
+ const card=x=>'<div class="card">'+pic(x.shoe)+'<p>'+esc(x.shoe.n)+'</p><small>Size '+esc(x.size)+'</small>'+(mine?'':'<div class="row"><button class="btn pri" data-req="'+x.id+'" data-n="'+esc(x.shoe.n)+'">Request this shoe</button></div>')+'</div>';
+ $('#pf').innerHTML='<div class="phead"><h2 style="margin:0">'+esc(p.name)+(mine?' (you)':'')+'</h2><div class="pst"><span>Net worth <b>'+Number(p.networth).toLocaleString()+'</b></span><span>Shoes <b>'+p.shoes+'</b></span><span>Collections done <b>'+p.collections.length+'</b></span></div></div>'
+  +(p.collections.length?'<p class="msg">Finished collections: '+p.collections.map(esc).join(', ')+'</p>':'')
+  +'<h3 class="ph3">Showcase</h3><div class="cards">'+(p.showcase.map(card).join('')||'<p class="msg">'+(mine?'Add up to 3 shoes from your inventory with the Showcase button.':'Nothing in the showcase yet.')+'</p>')+'</div>'
+  +'<h3 class="ph3">Inventory'+(p.shoes>60?' (latest 60)':'')+'</h3><div class="cards">'+(p.inventory.map(card).join('')||'<p class="msg">No shoes.</p>')+'</div>';
+}
+$('#pf').onclick=e=>{const id=e.target.dataset.req;if(!id)return;
+ const o=Math.round(+prompt('How many coins do you offer for '+e.target.dataset.n+'?','500'));if(!(o>0))return;
+ rpc('request_shoe',{p_inv:+id,p_offer:o},'Request sent! They get a message, now or when they come online.')};
+function setTheme(t){document.documentElement.dataset.theme=t;try{localStorage.setItem('theme',t)}catch(e){}$('#th').textContent=t==='light'?'Dark mode':'Light mode'}
+$('#th').onclick=()=>setTheme(document.documentElement.dataset.theme==='light'?'dark':'light');
+setTheme(document.documentElement.dataset.theme||'dark');
 async function login(up){
  const email=$('#em').value.trim(),password=$('#pw').value;
  const r=up?await SB.auth.signUp({email,password}):await SB.auth.signInWithPassword({email,password});
