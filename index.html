@@ -4,14 +4,14 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>SoleSmith - Your Sneaker Inventory</title>
-<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=Inter:wght@400;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
 <script>try{document.documentElement.dataset.theme=localStorage.getItem('theme')||'dark'}catch(e){}</script>
 <style>
 :root{--ink:#1b1626;--ink2:#2a2338;--paper:#efece6;--coral:#ff5a36;--line:#3a3150;--mut:#a79fba;--fg:#fff}
 :root[data-theme="light"]{--ink:#f3f0ea;--ink2:#ffffff;--line:#d9d3e3;--mut:#6b6480;--fg:#1b1626}
 *{box-sizing:border-box;margin:0}
-body{font-family:Inter,system-ui,sans-serif;background:var(--ink);color:var(--fg);min-height:100vh}
+body{-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility;font-family:Inter,system-ui,sans-serif;background:var(--ink);color:var(--fg);min-height:100vh}
 header{display:flex;justify-content:space-between;align-items:center;padding:18px 28px;gap:12px;flex-wrap:wrap;max-width:1250px;margin:auto}
 .logo{font-family:Syne,sans-serif;font-weight:800;font-size:26px}.logo b{color:var(--coral)}
 .who{display:flex;gap:12px;align-items:center;font-weight:700}
@@ -23,7 +23,7 @@ header{display:flex;justify-content:space-between;align-items:center;padding:18p
 .tab.on{background:var(--fg);color:var(--ink)}
 .view{max-width:1250px;margin:auto;padding:0 28px 60px}
 .view[hidden]{display:none}
-h2{font:800 26px Syne;margin-bottom:8px}
+h2{font:800 26px Inter,system-ui,sans-serif;letter-spacing:-.02em;margin-bottom:8px}
 .msg{color:var(--mut);margin-bottom:14px}.msg a{color:var(--coral)}
 .cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:14px}
 .card{background:var(--ink2);border-radius:20px;padding:12px;border:1px solid transparent}
@@ -41,12 +41,12 @@ h2{font:800 26px Syne;margin-bottom:8px}
 .mbar{height:10px;background:var(--ink);border-radius:9px;margin:12px 4px 0;overflow:hidden}.mbar i{display:block;height:100%;background:linear-gradient(90deg,var(--coral),#ffb400)}
 .lbr{display:grid;grid-template-columns:50px 1fr 130px 210px;gap:10px;align-items:center;background:var(--ink2);padding:13px 16px;border-radius:14px;margin-bottom:8px}.lbr.me{outline:2px solid var(--coral)}.lbr small{color:var(--mut)}
 @media(max-width:700px){.lbr{grid-template-columns:40px 1fr 100px}.lbr small{display:none}}
-.colset{background:var(--ink2);border-radius:20px;padding:16px;margin-bottom:16px}.colh{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:12px}.colh h3{font:800 20px Syne;margin:0}.colh small{color:var(--mut)}
+.colset{background:var(--ink2);border-radius:20px;padding:16px;margin-bottom:16px}.colh{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:12px}.colh h3{font:800 20px Inter,system-ui,sans-serif;letter-spacing:-.01em;margin:0}.colh small{color:var(--mut)}
 .colg{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px}.cs{background:var(--paper);border-radius:12px;padding:8px;color:#1b1626;text-align:center}.cs small{font-weight:600;font-size:11px;display:block}
 .plink{color:var(--coral);text-decoration:none;font-weight:700}
 .phead{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:10px}
 .pst{display:flex;gap:10px;flex-wrap:wrap}.pst span{background:var(--ink2);padding:8px 14px;border-radius:99px}
-.ph3{font:800 18px Syne;margin:18px 0 10px}
+.ph3{font:700 18px Inter,system-ui,sans-serif;letter-spacing:-.01em;margin:18px 0 10px}
 .view .of{background:var(--ink2)}.of.new{outline:2px solid var(--coral)}.of small{color:var(--mut)}
 :focus-visible{outline:3px solid #ffb400;outline-offset:2px}
 #toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(90px);background:var(--fg);color:var(--ink);padding:12px 20px;border-radius:14px;font-weight:600;transition:transform .3s;z-index:20;max-width:90vw}
